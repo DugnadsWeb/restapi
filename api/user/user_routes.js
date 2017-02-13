@@ -41,4 +41,14 @@ routes.put('/', (req, res) => {
   });
 });
 
+
+// DELETE
+routes.delete('/', (req, res) => {
+  var user = new User(req.body);
+  user.delete((status, message) => {
+    res.status(status).send(message);
+  });
+});
+
+
 module.exports = routes;

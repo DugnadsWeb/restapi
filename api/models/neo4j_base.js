@@ -16,7 +16,8 @@ var db_base = function(){
       var query = build_create_query(this);
       var session = driver.session();
       session.run(query)
-        .then(() => {
+        .then((result) => {
+          console.log(result);
           session.close();
           callback(200, 'Object Creaated');
         })
@@ -63,9 +64,22 @@ var db_base = function(){
         });
   }
 
-  // ###########
-  // statics ###
-  // ###########
+  // delete the object
+  this.delete = function(callback){
+    var query = build_match_clause(this) + " delete a";
+    console.log(query);
+    var session = driver.session();
+    session.run(query)
+      .then(() => {
+        session.close();
+        callback(200, this.constructor.name + " was deleted");
+      })
+      .catch((err) => {
+        session.close();
+        callback(400, err);
+      });
+  }
+
 
   this.read_all_from_class = function(class_name, callback){
     var query = "MATCH (a:" + class_name + ") RETURN a";
@@ -77,7 +91,6 @@ var db_base = function(){
         for (var i in result.records) {
           ret.push(result.records[i]._fields[0].properties);
         }
-        console.log(ret);
         callback(200, ret);
       })
       .catch((err) => {
@@ -85,8 +98,6 @@ var db_base = function(){
         callback(400, err);
       });
   }
-
-
 
   // builds the create query for the object
   function build_create_query(me){
@@ -96,7 +107,6 @@ var db_base = function(){
     }
     return query.substring(0, query.length-1) + "})";
   }
-
 
   // builds the get query
   // requires that the object has at least one unique field!
