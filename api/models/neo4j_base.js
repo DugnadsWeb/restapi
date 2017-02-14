@@ -1,6 +1,13 @@
 var driver = require('../../neo4j_db')();
 
 
+/*
+* database base object for neo4j
+* This is an attempt at abstracting away the underlying database from our model,
+* so the model will work regardless of database.
+* TODO needs a shitton of tests!!
+*/
+
 var db_base = function(){
 
   this.db_fields = {};
@@ -36,11 +43,11 @@ var db_base = function(){
   // requires that the object has at least one unique field!
   this.read = function(callback){
     var query = build_get_query(this);
+    console.log(query);
     var session = driver.session();
     session.run(query)
       .then((result) => {
         session.close();
-        console.log(result.records[0]);
         callback(200, result.records[0]._fields[0].properties);
       })
       .catch((err) => {
@@ -135,7 +142,8 @@ var db_base = function(){
     for (var field in me.db_fields){
       if (typeof me.db_fields[field] !== 'undefined'){
         for (var i in me.db_fields[field].meta){
-          if (me.db_fields[field].meta[i] == 'unique'){
+          if (me.db_fields[field].meta[i] == 'unique' ||
+            me.db_fields[field].meta[i] == 'use'){
             query += field + ": \"" + me.db_fields[field].data + "\",";
           }
         }

@@ -19,7 +19,6 @@ var port = config.port; // used to create, sign, and verify tokens
 // init database driver
 neo4j();
 
-app.set('superSecret', config.secret); // secret variable
 
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));

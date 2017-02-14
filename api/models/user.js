@@ -6,6 +6,8 @@ var RequiredArgumentExeption = require('../exceptions/required_argument_exceptio
 /*
 * This is the base user object.
 * TODO email is currently a unique selector, migth need to use ids instead.
+* TODO password is not hashed
+* TODO password is returned with user, possible fix: add noreturn meta tag
 */
 var User = function(arg){
   Db_base.call(this);
@@ -23,7 +25,6 @@ var User = function(arg){
   _init(this, arg);
 
 
-  console.log(this);
   // User creation validation
   this.validate = function(db_fields){
     if(db_fields.first_name.data.length > 2 &&
