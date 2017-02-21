@@ -11,6 +11,7 @@ var routes = express.Router();
 */
 routes.post('/', (req, res) => {
   var credentials = req.body;
+  console.log(req);
   var user = new User(credentials);
   user.db_fields.password.meta.push('use');
   user.read((status, response) => {
