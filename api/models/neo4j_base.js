@@ -93,27 +93,6 @@ var db_base = function(){
   }
 
 
-  this.read_all_from_class = function(class_name, callback){
-    console.log("read_all_from_class");
-    var query = "MATCH (a:" + class_name + ") RETURN a";
-    var session = driver.session();
-    console.log("yolo");
-    session.run(query)
-      .then((result) => {
-        session.close();
-        var ret = [];
-        console.log(result);
-        for (var i in result.records) {
-          ret.push(result.records[i]._fields[0].properties);
-        }
-        callback(200, ret);
-      })
-      .catch((err) => {
-        session.close();
-        callback(400, err);
-      });
-  }
-
   // builds the create query for the object
   function build_create_query(me){
     var query = "CREATE (a:" + me.constructor.name + " { "
@@ -162,6 +141,26 @@ var db_base = function(){
 
 
 // end of db_base
+}
+
+db_base.read_all_from_class = function(class_name, callback) {
+  var query = "MATCH (a:" + class_name + ") RETURN a";
+  var session = driver.session();
+  console.log("yolo");
+  session.run(query)
+    .then((result) => {
+      session.close();
+      var ret = [];
+      console.log(result);
+      for (var i in result.records) {
+        ret.push(result.records[i]._fields[0].properties);
+      }
+      callback(200, ret);
+    })
+    .catch((err) => {
+      session.close();
+      callback(400, err);
+    });
 }
 
 module.exports = db_base;
