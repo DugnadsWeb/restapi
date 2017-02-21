@@ -10,28 +10,7 @@ var RequiredArgumentExeption = require('../exceptions/required_argument_exceptio
 * TODO password is returned with user, possible fix: add noreturn meta tag
 */
 var User = function(arg){
-  //Db_base.call(this);
-
-
-
-	function hash_pw(pw)
-	{
-			const crypto = require('crypto');
-			var pw = pw;
-			var salt = crypto.randomBytes(32).toString('hex');
-			var hash = crypto.createHash('md5', salt).update(pw).digest('hex');
-			return hash;
-	}
-
-	function hashPasswordWithSalt(pw, email)
-	{
-		const crypto = require('crypto');
-		var iterations = 10000;
-
-		var hash = crypto.pbkdf2Sync(pw, email, iterations, 128, 'sha512');
-		return hash.toString('hex');
-
-	}
+  Db_base.call(this);
 
   // User propperties
   this.db_fields = {
@@ -56,7 +35,7 @@ var User = function(arg){
     return false;
   };
 
-  // private functions
+
   function _init(me, args) {
     var fields = me.db_fields;
     for (field in fields){
@@ -73,8 +52,8 @@ var User = function(arg){
       	}
       	else
       	{
-
-      	fields.password = new DbField(hashPasswordWithSalt(args[field], args.email));
+      	   let password = new DbField(hashPasswordWithSalt(args[field], args.email));
+           fields.password = new DbField(password)
       	}
 
       }
@@ -82,9 +61,28 @@ var User = function(arg){
       {
 
         if (is_undefined(args[field])){fields[field] = new DbField(null, [])}
-        else {fields[field] = new DbField(args[field], [])}
+        else {fields[field] = new DbField(args[field])}
       }
     }
+  }
+
+  function hash_pw(pw)
+  {
+      const crypto = require('crypto');
+      var pw = pw;
+      var salt = crypto.randomBytes(32).toString('hex');
+      var hash = crypto.createHash('md5', salt).update(pw).digest('hex');
+      return hash;
+  }
+
+  function hashPasswordWithSalt(pw, email)
+  {
+    const crypto = require('crypto');
+    var iterations = 10000;
+
+    var hash = crypto.pbkdf2Sync(pw, email, iterations, 128, 'sha512');
+    return hash.toString('hex');
+
   }
 
 
