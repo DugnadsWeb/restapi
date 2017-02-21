@@ -26,6 +26,7 @@ var User = function(arg){
 
   // User creation validation
   this.validate = function(db_fields){
+    console.log(db_fields);
     if(db_fields.first_name.data.length > 2 &&
       db_fields.last_name.data.length > 2 &&
       db_fields.password.data.length > 5 &&
@@ -52,7 +53,7 @@ var User = function(arg){
       	}
       	else
       	{
-      	   let password = new DbField(hashPasswordWithSalt(args[field], args.email));
+      	   let password = hashPasswordWithSalt(args[field], args.email);
            fields.password = new DbField(password)
       	}
 
@@ -60,7 +61,7 @@ var User = function(arg){
       else
       {
 
-        if (is_undefined(args[field])){fields[field] = new DbField(null, [])}
+        if (is_undefined(args[field])){fields[field] = new DbField(null)}
         else {fields[field] = new DbField(args[field])}
       }
     }
