@@ -6,12 +6,30 @@ var RequiredArgumentExeption = require('../exceptions/required_argument_exceptio
 /*
 * This is the base user object.
 * TODO email is currently a unique selector, migth need to use ids instead.
-* TODO password is not hashed
+* TODO possible deprecated Buffer from hashing
 * TODO password is returned with user, possible fix: add noreturn meta tag
 */
 var User = function(arg){
   Db_base.call(this);
+	
+	function hash_pw(pw)
+	{
+			const crypto = require('crypto');
+			var pw = pw;
+			var salt = crypto.randomBytes(32).toString('hex');
+			var hash = crypto.createHash('md5', salt).update(pw).digest('hex');
+			return hash;
+	}
+	
+	function hashPasswordWithSalt(pw, email)
+	{
+		const crypto = require('crypto');
+		var iterations = 10000;
 
+		var hash = crypto.pbkdf2Sync(pw, email, iterations, 128, 'sha512');
+		return hash.toString('hex');
+		
+	}
 
   // User propperties
   this.db_fields = {
@@ -44,7 +62,22 @@ var User = function(arg){
         if (typeof args.email !== 'string'){
           throw new  RequiredArgumentExeption("The email field of user is missing")
         } else {fields.email = new DbField(args.email, ['unique'])}
-      }else{
+      
+      }
+      else if(field === 'password'){
+      	if(typeof args.password !== 'string')
+      	{
+      		throw new  RequiredArgumentExeption("Ugyldig passord")
+      	}
+      	else
+      	{
+      
+      	fields.password = new DbField(hashPasswordWithSalt(args[field], args.email));
+      	}
+      	
+      }  
+      else
+      {
 
         if (is_undefined(args[field])){fields[field] = new DbField(null, [])}
         else {fields[field] = new DbField(args[field], [])}
