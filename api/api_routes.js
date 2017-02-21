@@ -5,6 +5,7 @@ var routes = express.Router();
 var user = require('./user/user_routes');
 var auth = require('./auth/auth_routes');
 
+
 routes.all("/*", function(req, res, next){
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -13,13 +14,14 @@ routes.all("/*", function(req, res, next){
   next();
 });
 
-routes.options("/*", function(req, res, next){
+routes.options("/*", function(req, res){
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, \
     Content-Length, X-Requested-With, application/json');
   res.sendStatus(200);
 });
+
 
 routes.use('/user', user);
 routes.use('/auth', auth);

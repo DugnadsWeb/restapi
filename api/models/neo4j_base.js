@@ -94,12 +94,15 @@ var db_base = function(){
 
 
   this.read_all_from_class = function(class_name, callback){
+    console.log("read_all_from_class");
     var query = "MATCH (a:" + class_name + ") RETURN a";
     var session = driver.session();
+    console.log("yolo");
     session.run(query)
       .then((result) => {
         session.close();
         var ret = [];
+        console.log(result);
         for (var i in result.records) {
           ret.push(result.records[i]._fields[0].properties);
         }

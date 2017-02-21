@@ -9,9 +9,8 @@ var routes = express.Router();
 
 // GET
 routes.get('/', (req, res) => {
-  // TODO super ugly solution!! needs to be fixed
-  new User({email: 'fafvs'}).read_all_from_class('User', (status, message) => {
-    console.log(message);
+  // TODO super ugly solution!! needs to be fixe
+  new User({email: 'fafvs', password: 'yolo'}).read_all_from_class('User', (status, message) => {
     res.status(status).send(message);
   })
 });
