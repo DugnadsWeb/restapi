@@ -48,7 +48,12 @@ var db_base = function(){
     session.run(query)
       .then((result) => {
         session.close();
-        callback(200, result.records[0]._fields[0].properties);
+        if (!!result.records.length != 0){
+          console.log(result.records);
+          callback(200, result.records[0]._fields[0].properties);
+        }else{
+          callback(404, "email or password missmatch");
+        }
       })
       .catch((err) => {
         session.close();
