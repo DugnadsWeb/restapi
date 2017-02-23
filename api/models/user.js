@@ -25,8 +25,8 @@ var User = function(arg){
 
 
   // User creation validation
+  // TODO add regex checks
   this.validate = function(db_fields){
-    console.log(db_fields);
     if(db_fields.first_name.data.length > 2 &&
       db_fields.last_name.data.length > 2 &&
       db_fields.password.data.length > 5 &&
@@ -60,8 +60,8 @@ var User = function(arg){
       }
       else
       {
-
-        if (is_undefined(args[field])){fields[field] = new DbField(null)}
+        // TODO to add or not to add
+        if (!!args[field]){fields[field] = new DbField(null)}
         else {fields[field] = new DbField(args[field])}
       }
     }

@@ -91,6 +91,22 @@ var db_base = function(){
         callback(400, err);
       });
   }
+  // TODO try to abstract this to sql if possible
+  // arg: relationship ie join table in sql
+  this.get_realations_of_type = function(type, relationship, callback){
+    query = build_match_clause;
+    query += "-[b:" + relationship + "]->(c:" + type + ") return c";
+  }
+
+
+  this.create_relation = function(relate_object, relationship){
+    return new Promise((res, rej) => {
+      setTimeout(function(){
+        res("Success!"); //Yay! Everything went well!
+    }, 250);
+  });
+
+  }
 
 
   // builds the create query for the object
