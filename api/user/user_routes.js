@@ -2,6 +2,7 @@ var express = require('express');
 var User = require('../models/user.js');
 var Organization = require('../models/organization.js');
 var Applied = require('../models/relationships/applied.js');
+var jwt = require('jsonwebtoken');
 
 var routes = express.Router();
 
@@ -21,6 +22,17 @@ routes.get('/:email', (req, res) => {
   user.read((status, message) => {
     res.status(status).send(message);
   });
+});
+
+routes.post('/me', (req,res) => {
+	var token = req.body.token;
+	//console.log(token);
+	var decoded = jwt.decode(token, {complete: true});
+	//console.log(decoded);
+	var decoded = JSON.stringify({decoded});
+	res.status(200).send(decoded);
+	
+	//res.send(decoded);
 });
 
 // #######
