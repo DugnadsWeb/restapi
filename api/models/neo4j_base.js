@@ -99,12 +99,18 @@ var db_base = function(){
   }
 
 
-  this.create_relation = function(relate_object, relationship){
-    return new Promise((res, rej) => {
-      setTimeout(function(){
-        res("Success!"); //Yay! Everything went well!
-    }, 250);
-  });
+  this.create_relation = function(relate_object, relationship, callback){
+    query = build_relation_query();
+    session = driver.session();
+    session.run(query)
+      .then(() => {
+        session.close();
+        callback(200, "relationship created");
+      })
+      .catch((err) => {
+        session.close();
+        callback(400, err);
+      });
 
   }
 
@@ -156,11 +162,32 @@ var db_base = function(){
   }
 
 
+  function build_relation_query(me, relate_object, relationship){
+    // find object to edit
+    var query = build_match_clause(me);
+    query += "(b:" + relate_object.constructor.name + " {";
+    for (var field in relate_object.db_fields){
+      if (typeof relate_object.db_fields[field] !== 'undefined'){
+        for (var i in relate_object.db_fields[field].meta){
+          if (relate_object.db_fields[field].meta[i] == 'unique' ||
+            relate_object.db_fields[field].meta[i] == 'use'){
+            query += field + ": \"" + relate_object.db_fields[field].data + "\",";
+          }
+        }
+      }
+    }
+    query = query.substring(0, query.length-1) + "})";
+    query += " CREATE (a)-[r:" + relationship.constructor.name + "]->(b) \
+      return r";
+    return query;
+  }
+
+
 // end of db_base
 }
 
-db_base.read_all_from_class = function(class_name, callback) {
-  var query = "MATCH (a:" + class_name + ") RETURN a";
+db_base.read_all_from_class = function(callback) {
+  var query = "MATCH (a:" + this.name + ") RETURN a";
   var session = driver.session();
   console.log("yolo");
   session.run(query)
@@ -178,5 +205,47 @@ db_base.read_all_from_class = function(class_name, callback) {
       callback(400, err);
     });
 }
+
+
+db_base.get_unique = function(unique_id){
+  return new Promise((res, rej) => {
+    query = this._get_from_unique_identifier_query(id);
+    session = driver.session();
+    session.run(query)
+    .then((result) => {
+      session.close();
+      //console.log(result.records[0]._fields[0].properties);
+      if (result.records[0].length == 1){
+        res(result.records[0]._fields[0].properties);
+      } else if (result.records.length == 0){
+        rej("No results found");
+      } else {
+        rej("Multiple results found; something is seriously wrong");
+      }
+    })
+    .catch((err) => {
+      session.close();
+      rej(err);
+    })
+  })
+}
+
+db_base._get_from_unique_identifier_query = function(id){
+  query = "MATCH (a:" + this.name + "{ "
+
+  for (prop in this.db_blueprint){
+      if (this.db_blueprint[prop].meta.includes("unique")){
+        console.log(prop);
+        query += prop + ": \"" + id + "\"";
+      }
+    }
+  query += " }) RETURN a";
+  console.log(query);
+  return query;
+}
+
+db_base.blueprint = {};
+
+
 
 module.exports = db_base;

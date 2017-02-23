@@ -1,26 +1,19 @@
 var Db_base = require('./neo4j_base.js');
 var DbField = require('./db_field.js');
 var RequiredArgumentExeption = require('../exceptions/required_argument_exception.js');
-var uuid = require('uuid');
+var uuid = require('uuid/v4');
 
 var Organization = function(args){
   Db_base.call(this);
 
   // Organization propperties
-  this.db_fields = {
-    uuid: new DbField(null, ['unique']),
-    org_number: new DbField(),
-    name: new DbField(),
-    email: new DbField(),
-    phone: new DbField(),
-    description: new DbField()
-  }
+  this.db_fields = Organization.db_blueprint;
 
   _init(this, args);
 
-  // TODO add checks
+  // TODO add regex checks
   this.validate = function(db_fields){
-    if (db_fields.org_nuber.data.length == 9 &&
+    if (db_fields.org_number.data.length == 9 &&
       db_fields.name.data.length > 3 &&
       db_fields.email.data.length > 5 &&
       db_fields.phone.data.length >= 8){
@@ -30,18 +23,30 @@ var Organization = function(args){
   }
 
   function _init(me, args) {
-    field = me.db_fields;
+    fields = me.db_fields;
+    if (!('uuid' in args)){
+      fields['uuid'].data = uuid();
+    }
     for (arg in args){
       if (arg in me.db_fields){
-        me.db_fields[arg].data = args.arg
+        fields[arg].data = args[arg]
       }
     }
   }
+// end of organization
+}
 
+Object.assign(Organization, Db_base);
 
+Organization.db_blueprint = {
+  uuid: new DbField(null, ['unique']),
+  org_number: new DbField(),
+  name: new DbField(),
+  email: new DbField(),
+  phone: new DbField(),
+  description: new DbField()
 }
 
 
-Object.assign(Organization, Db_base);
 
 module.exports = Organization

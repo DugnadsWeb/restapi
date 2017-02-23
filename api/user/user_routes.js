@@ -11,7 +11,7 @@ var routes = express.Router();
 
 // GET
 routes.get('/', (req, res) => {
-  User.read_all_from_class('User', (status, message) => {
+  User.read_all_from_class((status, message) => {
     res.status(status).send(message);
   })
 });
@@ -37,13 +37,18 @@ routes.post('/', (req, res) => {
 
 // Apply to organisation
 routes.post('/join', (req, res) => {
-  var user = new User(req.body.user);
-  var org = new Organization(req.body.organisation);
-  user.create_relation(org, new Applied())
-    .then((message) => {
-      console.log(message);
-    });
-  res.sendStatus(204);
+  var user = User.get_unique(req.body.user.email);
+  var org = Organization.get_unique(req.body.organization.uuid);
+  Promise.all([user, org])
+    .then((valuse) => {
+      console.log(valuse);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  user.create_relation(org, new Applied(), (status, message) => {
+    res.status(status).send(message);
+  });
 });
 
 

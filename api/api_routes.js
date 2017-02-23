@@ -4,6 +4,7 @@ var routes = express.Router();
 // api Routes
 var user = require('./user/user_routes');
 var auth = require('./auth/auth_routes');
+var organization = require('./org/organization_routes');
 
 
 routes.all("/*", function(req, res, next){
@@ -25,6 +26,6 @@ routes.options("/*", function(req, res){
 
 routes.use('/user', user);
 routes.use('/auth', auth);
-
+routes.use('/org', organization);
 
 module.exports = routes;
