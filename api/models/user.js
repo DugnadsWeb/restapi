@@ -61,7 +61,7 @@ var User = function(arg){
       else
       {
         // TODO to add or not to add
-        if (!!args[field]){fields[field] = new DbField(null)}
+        if (!args[field]){fields[field] = new DbField(null)}
         else {fields[field] = new DbField(args[field])}
       }
     }
