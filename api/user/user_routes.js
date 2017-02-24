@@ -10,6 +10,10 @@ var routes = express.Router();
 // path mappings #########
 // #######################
 
+// TODO IMPORTANT: Do not return database errors in production
+
+
+
 // GET
 routes.get('/', (req, res) => {
   User.read_all_from_class((status, message) => {
@@ -18,9 +22,12 @@ routes.get('/', (req, res) => {
 });
 
 routes.get('/:email', (req, res) => {
-  var user = new User(req.params);
-  user.read((status, message) => {
-    res.status(status).send(message);
+  User.get_unique(req.params.email)
+  .then((user) => {
+    res.status(200).send(user);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
   });
 });
 
