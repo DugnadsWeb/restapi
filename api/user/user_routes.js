@@ -24,6 +24,7 @@ routes.get('/:email', (req, res) => {
   });
 });
 
+// TODO trenger vi egentlig denne, kan egentlig sende med brukerinfo under innlogging
 routes.post('/me', (req,res) => {
 	var token = req.body.token;
 	//console.log(token);
@@ -47,7 +48,17 @@ routes.post('/', (req, res) => {
   });
 });
 
-// Apply to organisation
+/*
+* Apply to organisation
+*   Request body:
+*    "user": {
+*      "email": "email@interwebs.tld"
+*    },
+*    "organisation": {
+*      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
+*    }
+*/
+
 routes.post('/join', (req, res) => {
   User.get_unique(req.body.user.email)
   .then((user_res) => {
@@ -70,29 +81,6 @@ routes.post('/join', (req, res) => {
   .catch((err) => {
     res.status(400).send(err)
   })
-  /*
-  var org = Organization.get_unique(req.body.organization.uuid);
-  Promise.all([user, org])
-    .then(values => {
-      user = new User(values[0]);
-      org = new Organization(values[1]);
-      user.create_relation(org, new Applied())
-      .then(() => {
-        res.status(200).send("Application sent");
-      })
-      .catch((err) => {
-        res.status(400).send(err);
-      })
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-
-  user.create_relation(org, new Applied(), (status, message) => {
-    res.status(status).send(message);
-  });
-  */
-  res.sendStatus(204);
 });
 
 
