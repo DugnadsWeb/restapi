@@ -30,8 +30,10 @@ routes.post('/me', (req,res) => {
 	//console.log(token);
 	var decoded = jwt.decode(token, {complete: true});
 	//console.log(decoded);
-	var decoded = JSON.stringify({decoded});
-	res.status(200).send(decoded);
+	//console.log(decoded.payload);
+	var payload = decoded.payload;
+	var payload = JSON.stringify({payload});
+	res.status(200).send(payload);
 
 	//res.send(decoded);
 });
