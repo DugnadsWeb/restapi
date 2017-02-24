@@ -1,7 +1,7 @@
 module.exports = {
   'database':{
     'server': "bolt://localhost:7687/",
-    'user': "neo4j",
+    'user': "dugnad",
     'pw': "dugnad",
   },
 
