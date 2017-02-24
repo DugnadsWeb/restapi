@@ -31,7 +31,7 @@ routes.post('/me', (req,res) => {
 	//console.log(decoded);
 	var decoded = JSON.stringify({decoded});
 	res.status(200).send(decoded);
-	
+
 	//res.send(decoded);
 });
 
@@ -49,18 +49,50 @@ routes.post('/', (req, res) => {
 
 // Apply to organisation
 routes.post('/join', (req, res) => {
-  var user = User.get_unique(req.body.user.email);
+  User.get_unique(req.body.user.email)
+  .then((user_res) => {
+    Organization.get_unique(req.body.organization.uuid)
+    .then((org_res) => {
+      user = new User(user_res);
+      org = new Organization(org_res);
+      user.create_relation(org, new Applied)
+      .then(() => {
+        res.status(200).send("Application sent")
+      })
+      .catch((err) =>{
+        res.status(400).send(err)
+      })
+    })
+    .catch((err) => {
+      res.status(400).send(err)
+    });
+  })
+  .catch((err) => {
+    res.status(400).send(err)
+  })
+  /*
   var org = Organization.get_unique(req.body.organization.uuid);
   Promise.all([user, org])
-    .then((valuse) => {
-      console.log(valuse);
+    .then(values => {
+      user = new User(values[0]);
+      org = new Organization(values[1]);
+      user.create_relation(org, new Applied())
+      .then(() => {
+        res.status(200).send("Application sent");
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      })
     })
     .catch((err) => {
       console.log(err);
     })
+
   user.create_relation(org, new Applied(), (status, message) => {
     res.status(status).send(message);
   });
+  */
+  res.sendStatus(204);
 });
 
 

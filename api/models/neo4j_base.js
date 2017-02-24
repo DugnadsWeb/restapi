@@ -99,19 +99,20 @@ var db_base = function(){
   }
 
 
-  this.create_relation = function(relate_object, relationship, callback){
-    query = build_relation_query();
-    session = driver.session();
-    session.run(query)
-      .then(() => {
-        session.close();
-        callback(200, "relationship created");
-      })
-      .catch((err) => {
-        session.close();
-        callback(400, err);
-      });
-
+  this.create_relation = function(relate_object, relationship){
+    return new Promise((res, rej) => {
+      query = build_relation_query(this, relate_object, relationship);
+      session = driver.session();
+      session.run(query)
+        .then(() => {
+          session.close();
+          res();
+        })
+        .catch((err) => {
+          session.close();
+          rej(err);
+        });
+    });
   }
 
 
@@ -165,7 +166,7 @@ var db_base = function(){
   function build_relation_query(me, relate_object, relationship){
     // find object to edit
     var query = build_match_clause(me);
-    query += "(b:" + relate_object.constructor.name + " {";
+    query += ", (b:" + relate_object.constructor.name + " {";
     for (var field in relate_object.db_fields){
       if (typeof relate_object.db_fields[field] !== 'undefined'){
         for (var i in relate_object.db_fields[field].meta){
@@ -189,12 +190,10 @@ var db_base = function(){
 db_base.read_all_from_class = function(callback) {
   var query = "MATCH (a:" + this.name + ") RETURN a";
   var session = driver.session();
-  console.log("yolo");
   session.run(query)
     .then((result) => {
       session.close();
       var ret = [];
-      console.log(result);
       for (var i in result.records) {
         ret.push(result.records[i]._fields[0].properties);
       }
@@ -209,7 +208,7 @@ db_base.read_all_from_class = function(callback) {
 
 db_base.get_unique = function(unique_id){
   return new Promise((res, rej) => {
-    query = this._get_from_unique_identifier_query(id);
+    query = this._get_from_unique_identifier_query(unique_id);
     session = driver.session();
     session.run(query)
     .then((result) => {
@@ -235,12 +234,10 @@ db_base._get_from_unique_identifier_query = function(id){
 
   for (prop in this.db_blueprint){
       if (this.db_blueprint[prop].meta.includes("unique")){
-        console.log(prop);
         query += prop + ": \"" + id + "\"";
       }
     }
   query += " }) RETURN a";
-  console.log(query);
   return query;
 }
 
