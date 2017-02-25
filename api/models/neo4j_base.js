@@ -98,9 +98,10 @@ var db_base = function(){
   // arg: relationship ie join table in sql
   this.get_realations_of_type = function(type, relationship){
       return new Promise((res, rej) => {
-        query = "MATCH " + db_base.make_query_object(this, 'a') +
-        "-[b:" + relationship + "]-(c:" + type + ") return b, c";
+        query = "MATCH " + this.make_query_object('a') +
+        "-" + relationship.make_query_object('b', {use_all: true}) + "-(c:" + type + ") return b, c";
         let session = driver.session();
+        console.log(query);
         session.run(query)
         .then((result) => {
           session.close();
@@ -124,7 +125,6 @@ var db_base = function(){
   this.create_relation = function(relate_object, relationship, options){
     return new Promise((res, rej) => {
       query = create_relation_query(this, relate_object, relationship, options);
-
       session = driver.session();
       session.run(query)
         .then(() => {
@@ -136,6 +136,24 @@ var db_base = function(){
           rej(err);
         });
     });
+  }
+
+  // options: use_all - uses all defined object fields
+  this.make_query_object = function (tag, options){
+    options = !!options ? options : {};
+    var query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
+    for (field in this.db_fields){
+      if (!!this.db_fields[field].data){
+        for (var i in this.db_fields[field].meta){
+          if (this.db_fields[field].meta[i] == 'unique' ||
+            this.db_fields[field].meta[i] == 'use' ||
+            options.use_all){
+            query += field + ": \"" + this.db_fields[field].data + "\",";
+          }
+        }
+      }
+    }
+    return query.substring(0, query.length-1) + "})";
   }
 
 
@@ -156,31 +174,12 @@ var db_base = function(){
     options = !!options ? options : {};
     query = "MATCH" + me.make_query_object('a') + ", " +
       relate_object.make_query_object('b');
+      console.log(relationship);
     query += " CREATE " + (options.unique ? "UNIQUE" : "") +
-      " (a)-[r:" + relationship.constructor.name + "]->(b) return r";
+      " (a)-" + relationship.make_query_object('r', {use_all: true}) + "->(b) return r";
     console.log(query);
     return query;
   }
-
-  // options: use_all - uses all defined object fields
-  this.make_query_object = function (tag, options){
-    options = !!options ? options : {}
-    var query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " {";
-    for (var field in this.db_fields){
-      if (typeof this.db_fields[field] !== 'undefined'){
-        for (var i in this.db_fields[field].meta){
-          if ((this.db_fields[field].meta[i] == 'unique' ||
-            this.db_fields[field].meta[i] == 'use' ||
-            options.use_all) && !!this.db_fields[field].data){
-            query += field + ": \"" + this.db_fields[field].data + "\",";
-          }
-        }
-      }
-    }
-    return query.substring(0, query.length-1) + "})";
-  }
-
-
 
 // end of db_base
 }

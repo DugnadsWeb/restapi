@@ -1,6 +1,5 @@
 var Db_base = require('./neo4j_base.js');
 var DbField = require('./db_field.js');
-var is_undefined = require('../helpers/is_undefined.js');
 var RequiredArgumentExeption = require('../exceptions/required_argument_exception.js');
 
 /*
@@ -14,10 +13,10 @@ var User = function(arg){
 
   // User propperties
   this.db_fields = {
-    first_name: null,
-    last_name: null,
-    email: null,
-    password: null,
+    first_name: new DbField(),
+    last_name: new DbField(),
+    email: new DbField(null, ['unique']),
+    password: new DbField(),
   };
 
   // Initiates user
@@ -40,40 +39,15 @@ var User = function(arg){
   function _init(me, args) {
     var fields = me.db_fields;
     for (field in fields){
-      if (field === 'email'){
-        if (typeof args.email !== 'string'){
-          throw new  RequiredArgumentExeption("The email field of user is missing")
-        } else {fields.email = new DbField(args.email, ['unique'])}
-
-      }
-      else if(field === 'password'){
-      	if(typeof args.password !== 'string')
-      	{
-      		throw new  RequiredArgumentExeption("Ugyldig passord")
-      	}
-      	else
-      	{
+      if(field === 'password'){
+      	if(typeof args.password === 'string'){
       	   let password = hashPasswordWithSalt(args[field], args.email);
-           fields.password = new DbField(password)
+           fields.password.data = password
       	}
-
-      }
-      else
-      {
-        // TODO to add or not to add
-        if (!args[field]){fields[field] = new DbField(null)}
-        else {fields[field] = new DbField(args[field])}
+      } else if (field in args){
+        fields[field].data = args[field];
       }
     }
-  }
-
-  function hash_pw(pw)
-  {
-      const crypto = require('crypto');
-      var pw = pw;
-      var salt = crypto.randomBytes(32).toString('hex');
-      var hash = crypto.createHash('md5', salt).update(pw).digest('hex');
-      return hash;
   }
 
   function hashPasswordWithSalt(pw, email)
@@ -86,16 +60,12 @@ var User = function(arg){
 
   }
 
-
 // end of user
 }
 
 Object.assign(User, Db_base);
 
 // static fields for user
-
-
-
 
 
 // exports user;

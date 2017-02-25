@@ -65,46 +65,49 @@ routes.post('/', (req, res) => {
 *      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
 *    }
 */
-
 routes.post('/join', (req, res) => {
-  User.get_unique(req.body.user.email)
-  .then((user_res) => {
-    Organization.get_unique(req.body.organization.uuid)
-    .then((org_res) => {
-      user = new User(user_res);
-      org = new Organization(org_res);
-      user.create_relation(org, new Applied)
-      .then(() => {
-        res.status(200).send("Application sent")
-      })
-      .catch((err) =>{
-        res.status(400).send(err)
-      })
-    })
-    .catch((err) => {
-      res.status(400).send(err)
-    });
+  user = new User(req.body.user);
+  org = new Organization(req.body.organization);
+  application = new Applied();
+  user.create_relation(org, application, {unique: true})
+  .then(() => {
+    res.status(200).send("Application sent");
   })
   .catch((err) => {
-    res.status(400).send(err)
-  })
+    res.status(400).send(err);
+  });
 });
 
-
 // PUT
+/*
+* Edit user info
+*   Request body {
+*     "user": { "eamil": email@interwebs.tls },
+*     "edited_user": { user fileds to change }
+*   }
+*/
 routes.put('/', (req, res) => {
-  var user = new User(req.body);
-  user.update((status, message) => {
-    res.status(status).send(message);
-  });
+  var user = new User(req.body.user);
+  var edited_user = new User(req.body.edited_user);
+  user.update(edited_user)
+  .then((result) => {
+    res.status(200).send(result);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
 });
 
 
 // DELETE
 routes.delete('/', (req, res) => {
   var user = new User(req.body);
-  user.delete((status, message) => {
-    res.status(status).send(message);
+  user.delete()
+  .then((response) => {
+      res.status(200).send(response);
+  })
+  .catch((err) => {
+    res.status(200).send(err);
   });
 });
 
