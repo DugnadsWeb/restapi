@@ -97,7 +97,7 @@ routes.post('/applicant', (req, res) => {
 *     "user" { email: email@interwebs.tld },
 *     "organization": { uuid: this-is-not-a-real-uuid },
 *     "admin": true/false // true to set admin, false to revoke
-* TODO edit response
+*  TODO edit query to not remove admin if one admin remains
 */
 routes.post('/chadmin', (req, res) => {
   let user = new User(req.body.user);
@@ -109,6 +109,29 @@ routes.post('/chadmin', (req, res) => {
   Organization.custom_query(query)
   .then((result) => {
     res.status(200).send("Admin rights " + (req.body.admin? "granted" : "revoked"));
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
+})
+
+
+/* Remove member
+*   Request body: {
+*     "user" { email: email@interwebs.tld },
+*     "organization": { uuid: this-is-not-a-real-uuid }
+* TODO edit query to not remove member if member is last admin
+*/
+routes.post('/rmmember', (req, res) => {
+  let user = new User(req.body.user);
+  let org = new Organization(req.body.organization);
+  query = "MATCH " + user.make_query_object('a') +
+    "-[c:Member]->" + org.make_query_object('b') +
+    "DELETE c";
+  console.log(query);
+  Organization.custom_query(query)
+  .then((result) => {
+    res.status(200).send("Memeber removed");
   })
   .catch((err) => {
     res.status(400).send(err);
