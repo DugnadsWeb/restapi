@@ -71,12 +71,17 @@ routes.post('/join', (req, res) => {
   user = new User(req.body.user);
   org = new Organization(req.body.organization);
   application = new Applied();
-  user.create_relation(org, application, {unique: true})
-  .then(() => {
-    res.status(200).send("Application sent");
+  query = "MATCH " + user.make_query_object('a') + ", " +
+    org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
+    OR (a)-[:Member]->(b)) CREATE (a)-" +
+    application.make_query_object('c', {use_all: true}) + "->(b)";
+  console.log(query);
+  User.custom_query(query)
+  .then((result) => {
+    res.status(200).send("Application submitted");
   })
   .catch((err) => {
-    res.status(400).send(err);
+    res.status(200).send(err);
   });
 });
 

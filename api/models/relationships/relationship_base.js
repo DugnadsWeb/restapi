@@ -9,18 +9,14 @@ var RelationshipBase = function(){
 
   // options: use_all - uses all defined object fields
   this.make_query_object = function (tag, options){
-    console.log("relation make_query_object called");
     options = !!options ? options : {}
     let query = "[" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
     for (var field in this.db_fields){
-      console.log(field);
-      if (typeof this.db_fields[field] !== 'undefined'){
-        for (var i in this.db_fields[field].meta){
-          if ((this.db_fields[field].meta[i] == 'unique' ||
-            this.db_fields[field].meta[i] == 'use' ||
-            options.use_all) && !!this.db_fields[field].data){
-            query += field + ": \"" + this.db_fields[field].data + "\",";
-          }
+      if (!!this.db_fields[field].data){
+        if (this.db_fields[field].meta.indexOf('unique') != -1 ||
+          this.db_fields[field].meta.indexOf('use') != -1 ||
+          options.use_all){
+          query += field + ": \"" + this.db_fields[field].data + "\",";
         }
       }
     }

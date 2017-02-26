@@ -140,22 +140,19 @@ var db_base = function(){
 
   // options: use_all - uses all defined object fields
   this.make_query_object = function (tag, options){
-    options = !!options ? options : {};
-    var query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
-    for (field in this.db_fields){
-      if (!!this.db_fields[field].data){
-        for (var i in this.db_fields[field].meta){
-          if (this.db_fields[field].meta[i] == 'unique' ||
-            this.db_fields[field].meta[i] == 'use' ||
+      options = !!options ? options : {}
+      let query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
+      for (var field in this.db_fields){
+        if (!!this.db_fields[field].data){
+          if (this.db_fields[field].meta.indexOf('unique') != -1 ||
+            this.db_fields[field].meta.indexOf('use') != -1 ||
             options.use_all){
             query += field + ": \"" + this.db_fields[field].data + "\",";
           }
         }
       }
+      return query.substring(0, query.length-1) + "})";
     }
-    return query.substring(0, query.length-1) + "})";
-  }
-
 
   // builds the set query for the object
   function build_update_query(me){
@@ -241,19 +238,34 @@ db_base._get_from_unique_identifier_query = function(id){
 db_base.blueprint = {};
 
 
-db_base.make_query_object = function (object, tag){
-  var query = "(" + (!!tag ? tag : '') + ":" + object.constructor.name + " {";
-  for (var field in object.db_fields){
-    if (typeof object.db_fields[field] !== 'undefined'){
-      for (var i in object.db_fields[field].meta){
-        if (object.db_fields[field].meta[i] == 'unique' ||
-          object.db_fields[field].meta[i] == 'use'){
-          query += field + ": \"" + object.db_fields[field].data + "\",";
+db_base.make_query_object = function (tag, options){
+    options = !!options ? options : {}
+    let query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
+    for (var field in this.db_fields){
+      if (!!this.db_fields[field].data){
+        if (this.db_fields[field].meta.indexOf('unique') != -1 ||
+          this.db_fields[field].meta.indexOf('use') != -1 ||
+          options.use_all){
+          query += field + ": \"" + this.db_fields[field].data + "\",";
         }
       }
     }
+    return query.substring(0, query.length-1) + "})";
   }
-return query.substring(0, query.length-1) + "})";
+
+db_base.custom_query = function(query){
+  return new Promise((res, rej) => {
+    let session = driver.session();
+    session.run(query)
+    .then((result) => {
+      session.close();
+      res(result);
+    })
+    .catch((err) => {
+      session.close();
+      rej(err);
+    })
+  })
 }
 
 module.exports = db_base;
