@@ -2,10 +2,18 @@ var express = require('express');
 var User = require('../models/user');
 var Organization = require('../models/organization');
 var Applied = require('../models/relationships/applied');
-var Member = require('../models/relationships/member')
+var Member = require('../models/relationships/member');
+var dugnad_routes = require('./dugnad/dugnad_routes');
 
+
+// TODO add PUT
+// TODO add DELETE
 
 var routes = express.Router();
+
+
+
+routes.use('/dugnad', dugnad_routes);
 
 // ######
 // GET ##
@@ -55,12 +63,22 @@ routes.get('/:uuid/members', (req, res) => {
 // POST ##
 // #######
 
-// Create user
+/* Create user
+*   Request body: {
+*     "org_number": "my_nine_digit_org_number",
+*     "name": "my_orgs_name",
+*     "email": "my_orgs_email@domain.tld",
+*     "phone": "my_orgs_phone_number",
+*     "description": "a_discription_of_my_organizations"
+*/
 routes.post('/', (req, res) => {
-  Organization.get_from_unique_identifier(null);
   var org = new Organization(req.body);
-  org.create((status, message) => {
-    res.status(status).send(message);
+  org.create()
+  .then((result) => {
+    res.status(200).send("Organization created");
+  })
+  .catch((err) => {
+    res.status(400).send(err);
   });
 });
 

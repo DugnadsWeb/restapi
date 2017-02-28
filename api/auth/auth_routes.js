@@ -10,8 +10,37 @@ var routes = express.Router();
 * TODO write unit tests!!! not sure what happens if wrong cridentials are passed
 */
 routes.post('/', (req, res) => {
-  var credentials = req.body;
-  var user = new User(credentials);
+  var user_in = new User(req.body);
+  User.get_unique(req.body.email)
+  .then((result) => {
+    if (user_in.db_fields.password.data == result.password){
+      result.password = null;
+      user = new User(result)
+      jwt.sign(user, config.secret, {}, (err, token) => {
+        console.log(err);
+        res.status(200)
+          .send({
+          success: true,
+          message: 'Token to go',
+          token: token
+        });
+      })
+    } else {
+      res.status(400).send({
+        success: false,
+        message: 'authentication failed'
+      });
+    }
+  })
+
+  .catch((err) => {
+    res.status(400).send({
+      success: false,
+      message: 'authentication failed'
+    });
+  });
+});
+  /*
   user.db_fields.password.meta.push('use');
   user.read((status, response) => {
     if (status == 200){
@@ -31,7 +60,8 @@ routes.post('/', (req, res) => {
       });
     }
   });
-});
+  */
+
 
 
 

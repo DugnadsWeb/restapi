@@ -49,12 +49,23 @@ routes.post('/me', (req,res) => {
 // POST ##
 // #######
 
-// Create user
+/* Create user
+*   Request body: {
+*     "first_name": "my_first_name",
+*     "last_name": "my_last_name",
+*     "email": "my_email@domain.tld",
+*     "password": "my_super_safe_pw"
+*   }
+*/
 routes.post('/', (req, res) => {
   var user = new User(req.body);
-  user.create((status, message) => {
-    res.status(status).send(message);
-  });
+  user.create()
+  .then((result) => {
+    res.status(200).send("User created");
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
 });
 
 /*
@@ -66,6 +77,7 @@ routes.post('/', (req, res) => {
 *    "organisation": {
 *      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
 *    }
+* TODO maybe move this functionality to organization org/apply
 */
 routes.post('/join', (req, res) => {
   user = new User(req.body.user);

@@ -7,7 +7,14 @@ var Organization = function(args){
   Db_base.call(this);
 
   // Organization propperties
-  this.db_fields = Organization.db_blueprint;
+  this.db_fields = {
+    uuid: new DbField(null, ['unique']),
+    org_number: new DbField(),
+    name: new DbField(),
+    email: new DbField(),
+    phone: new DbField(),
+    description: new DbField()
+  }
 
   _init(this, args);
 
@@ -37,16 +44,6 @@ var Organization = function(args){
 }
 
 Object.assign(Organization, Db_base);
-
-Organization.db_blueprint = {
-  uuid: new DbField(null, ['unique']),
-  org_number: new DbField(),
-  name: new DbField(),
-  email: new DbField(),
-  phone: new DbField(),
-  description: new DbField()
-}
-
 
 
 module.exports = Organization

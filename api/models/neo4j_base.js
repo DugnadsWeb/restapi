@@ -18,22 +18,24 @@ var db_base = function(){
   // ###########
 
   // Creates the object in the database for the first time
-  this.create = function(callback){
-    if (this.validate(this.db_fields)){
-      var query = "CREATE " + this.make_query_object('a', {use_all: true});
-      var session = driver.session();
-      session.run(query)
-        .then((result) => {
-          session.close();
-          callback(200, 'Object Creaated');
-        })
-        .catch((err) => {
-          session.close();
-          callback(401, err);
-        });
-    }else {
-      callback(400, "Object does not validate");
-    }
+  this.create = function(){
+    return new Promise((res, rej) => {
+      if (this.validate(this.db_fields)){
+        var query = "CREATE " + this.make_query_object('a', {use_all: true});
+        var session = driver.session();
+        session.run(query)
+          .then((result) => {
+            session.close();
+            res(result);
+          })
+          .catch((err) => {
+            session.close();
+            rej(err);
+          });
+      }else {
+        rej(this.constructor.name + " did not validate");
+      }
+    });
   }
 
   // gets the object

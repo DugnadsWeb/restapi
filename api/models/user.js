@@ -12,12 +12,7 @@ var User = function(arg){
   Db_base.call(this);
 
   // User propperties
-  this.db_fields = {
-    first_name: new DbField(),
-    last_name: new DbField(),
-    email: new DbField(null, ['unique']),
-    password: new DbField(),
-  };
+  this.db_fields = User.db_blueprint;
 
   // Initiates user
   _init(this, arg);
@@ -62,6 +57,13 @@ var User = function(arg){
 
 // end of user
 }
+
+User.db_blueprint = {
+  first_name: new DbField(),
+  last_name: new DbField(),
+  email: new DbField(null, ['unique']),
+  password: new DbField(),
+};
 
 Object.assign(User, Db_base);
 
