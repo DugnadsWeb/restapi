@@ -24,8 +24,10 @@ var db_base = function(){
         var query = "CREATE " + this.make_query_object('a', {use_all: true});
         console.log(query);
         var session = driver.session();
+        console.log("driver.sessions() called");
         session.run(query)
           .then((result) => {
+          	console.log("dont close the fucking session");
             session.close();
             res(result);
           })
