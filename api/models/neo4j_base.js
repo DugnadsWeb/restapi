@@ -17,6 +17,16 @@ var db_base = function(){
   // methods ###
   // ###########
 
+
+  // Get db_fields
+  this.get_db_fields = function(){
+    ret = {};
+    for (field in this.db_fields){
+      ret[field] = this.db_fields[field].data;
+    }
+    return ret;
+  }
+
   // Creates the object in the database for the first time
   this.create = function(){
     return new Promise((res, rej) => {
@@ -83,12 +93,21 @@ var db_base = function(){
   // delete the object
   this.delete = function(){
     return new Promise((res, rej) => {
-      var query = "MATCH " + this.make_query_object('a') + " delete a";
+      var query = "MATCH " + this.make_query_object('a') +
+       " DELETE a RETURN id(a)";
       var session = driver.session();
       session.run(query)
-        .then(() => {
+        .then((result) => {
+          console.log(result);
           session.close();
-          res(this.constructor.name + " was deleted");
+          if (result.records.length == 1){
+            res(this.constructor.name + " was deleted");
+          }
+          else if (result.records.length == 0){
+            rej(this.constructor.name + " not found");
+          } else {
+            rej("Multiple " + this.constructor.name + " deleted. Something is wrong!");
+          }
         })
         .catch((err) => {
           session.close();
@@ -212,10 +231,10 @@ db_base.get_unique = function(unique_id){
     .then((result) => {
       session.close();
       //console.log(result.records[0]._fields[0].properties);
-      if (result.records[0].length == 1){
-        res(result.records[0]._fields[0].properties);
-      } else if (result.records.length == 0){
+      if (result.records.length == 0){
         rej("No results found");
+      } else if (result.records[0].length == 1){
+        res(result.records[0]._fields[0].properties);
       } else {
         rej("Multiple results found; something is seriously wrong");
       }

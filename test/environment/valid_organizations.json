@@ -1,0 +1,30 @@
+[
+  {
+    "org_number": "012345678",
+    "name": "Halden IL",
+    "email": "haldenil@whatever.no",
+    "phone": "99887766",
+    "description": "Dette er en beskrivelse av hva som skjer i Halden IL"
+  },
+  {
+    "org_number": "584950694",
+    "name": "En eller annen klubb",
+    "email": "en_email@provider.no",
+    "phone": "43454476",
+    "description": "Dette er en beskrivelse av hva som skjer i En eller annen klub"
+  },
+  {
+    "org_number": "837465395",
+    "name": "Mere FK",
+    "email": "mere@fotball.tld",
+    "phone": "43456567",
+    "description": "Vi driver med fotball og dugnad"
+  },
+  {
+    "org_number": "012345678",
+    "name": "Speider Gruppa",
+    "email": "super@speider.uk",
+    "phone": "93485864",
+    "description": "Ubevoktede barn i skogen"
+  }
+]

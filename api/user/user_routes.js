@@ -49,7 +49,7 @@ routes.post('/', (req, res) => {
   var user = new User(req.body);
   user.create()
   .then((result) => {
-    res.status(200).send("User created");
+    res.status(200).send({message:"User created"});
   })
   .catch((err) => {
     res.status(400).send(err);
@@ -108,6 +108,10 @@ routes.post('/join', (req, res) => {
 *   }
 */
 routes.put('/', (req, res) => {
+  if (!req.body.user || !req.body.edited_user) {
+    res.status(400).send({message:"request body is incomplete"});
+    return;
+  }
   var user = new User(req.body.user);
   var edited_user = new User(req.body.edited_user);
   user.update(edited_user)
@@ -128,7 +132,7 @@ routes.delete('/', (req, res) => {
       res.status(200).send(response);
   })
   .catch((err) => {
-    res.status(200).send(err);
+    res.status(400).send(err);
   });
 });
 
