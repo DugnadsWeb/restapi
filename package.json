@@ -3,7 +3,8 @@
   "main": "server.js",
   "scripts": {
     "test": "npm run clear && mocha",
-    "clear": "nodejs clear_db.js -r"
+    "clear": "nodejs clear_db.js -r",
+    "mkenv": "nodejs test/environment/env_gen.js make"
   },
   "dependencies": {
     "body-parser": "^1.16.0",

@@ -79,22 +79,16 @@ function populateEnvironment(){
     })
   }
 
-  // deletes test users from database
-  function removeUsers(me){
-    console.log("Depopulation environment..");
-    for (var i=0;i<me.users.length;i++){
-      me.users[i].delete();
-    }
+for (let i=0;i<process.argv.length;i++){
+  switch (process.argv[i]) {
+    case 'make':
+      populateEnvironment()
+      .then(env => {
+        process.exit(0);
+      })
+      break;
   }
-
-  // deletes organizations from database
-  function removeOrganizations(me){
-    console.log("Deorganizationate environment");
-    for (var i=0;i<me.organizations.length;i++){
-      me.organizations[i].delete()
-    }
-  }
-
+}
 
 
 module.exports = populateEnvironment;

@@ -86,14 +86,14 @@ routes.post('/', (req, res) => {
 * Request body:
 *   {
 *     "user": { "email": email@internetz.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid },
+*     "org": { uuid: this-is-not-a-real-uuid },
 *     "accept:" true/false
 *   }
 * TODO edit response
 */
 routes.post('/applicant', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   let query = "MATCH " + user.make_query_object('a') + "-" +
     "[r:Applied {status: 'true'}]->" + org.make_query_object('b') +
     "SET r.status = 'false' ";
@@ -113,13 +113,13 @@ routes.post('/applicant', (req, res) => {
 /* Set admin
 *   Request body: {
 *     "user" { email: email@interwebs.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid },
+*     "org": { uuid: this-is-not-a-real-uuid },
 *     "admin": true/false // true to set admin, false to revoke
 *  TODO edit query to not remove admin if one admin remains
 */
 routes.post('/chadmin', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   query = "MATCH " + user.make_query_object('a') +
     "-[c:Member]->" + org.make_query_object('b') +
     "SET c += {is_admin: '" + req.body.admin + "'} RETURN a";
@@ -137,12 +137,12 @@ routes.post('/chadmin', (req, res) => {
 /* Remove member
 *   Request body: {
 *     "user" { email: email@interwebs.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid }
+*     "org": { uuid: this-is-not-a-real-uuid }
 * TODO edit query to not remove member if member is last admin
 */
 routes.post('/rmmember', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   query = "MATCH " + user.make_query_object('a') +
     "-[c:Member]->" + org.make_query_object('b') +
     "DELETE c";
@@ -155,6 +155,35 @@ routes.post('/rmmember', (req, res) => {
     res.status(400).send(err);
   })
 })
+
+/*
+* Apply to organisation
+*   Request body:
+*    "user": {
+*      "email": "email@interwebs.tld"
+*    },
+*    "org": {
+*      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
+*    }
+* TODO maybe move this functionality to organization org/apply
+*/
+routes.post('/apply', (req, res) => {
+  user = new User(req.body.user);
+  org = new Organization(req.body.org);
+  application = new Applied();
+  query = "MATCH " + user.make_query_object('a') + ", " +
+    org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
+    OR (a)-[:Member]->(b)) CREATE (a)-" +
+    application.make_query_object('c', {use_all: true}) + "->(b)";
+  console.log(query);
+  User.custom_query(query)
+  .then((result) => {
+    res.status(200).send("Application submitted");
+  })
+  .catch((err) => {
+    res.status(200).send(err);
+  });
+});
 
 
 module.exports = routes;

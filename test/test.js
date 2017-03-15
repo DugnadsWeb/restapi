@@ -205,6 +205,24 @@ describe('RestAPI', () => {
         })
       })
     })
+    describe('POST application to organization', () => {
+      it('Should return a 200', done => {
+        Environment().then(env => {
+          chai.request('http://localhost:8888')
+            .post('/api/org/apply')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': env.get_random_user().get_db_fields().email},
+              'org': { 'uuid': env.get_random_org().get_db_fields().uuid}
+            })
+            .end((err, res) => {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              done();
+            })
+        })
+      })
+    })
     // organization end
   })
   // RestAPI describe end
