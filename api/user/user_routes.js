@@ -89,7 +89,6 @@ routes.post('/join', (req, res) => {
     org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
     OR (a)-[:Member]->(b)) CREATE (a)-" +
     application.make_query_object('c', {use_all: true}) + "->(b)";
-  console.log(query);
   User.custom_query(query)
   .then((result) => {
     res.status(200).send("Application submitted");

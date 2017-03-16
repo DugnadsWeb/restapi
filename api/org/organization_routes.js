@@ -166,22 +166,35 @@ routes.post('/rmmember', (req, res) => {
 *      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
 *    }
 * TODO maybe move this functionality to organization org/apply
+* Query : Matches User and Organization with given keys and creates a
+*   relationship if a user and organization is found, and the user does not have
+*   an active application or is not already a member.
 */
 routes.post('/apply', (req, res) => {
+  if(!req.body.user || !req.body.org){
+    res.status(400).send('Malformed request body');
+    return;
+  }
   user = new User(req.body.user);
   org = new Organization(req.body.org);
   application = new Applied();
   query = "MATCH " + user.make_query_object('a') + ", " +
     org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
     OR (a)-[:Member]->(b)) CREATE (a)-" +
-    application.make_query_object('c', {use_all: true}) + "->(b)";
-  console.log(query);
+    application.make_query_object('c', {use_all: true}) + "->(b) RETURN a, b, c";
   User.custom_query(query)
   .then((result) => {
-    res.status(200).send("Application submitted");
+    if (result.records.length == 0){
+      res.status(400).send('User and Organization does not exist, ' +
+        'or user is already a member or has an active application');
+    } else if (result.records[0].length == 3){
+      res.status(200).send("Application sent");
+    } else {
+      res.status(400).send("Something is wrong, this should not happen!");
+    }
   })
   .catch((err) => {
-    res.status(200).send(err);
+    res.status(400).send(err);
   });
 });
 

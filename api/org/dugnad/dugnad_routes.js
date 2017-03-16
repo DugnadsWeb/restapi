@@ -6,7 +6,7 @@ var Member = require('../../models/relationships/member');
 var Dugnad = require('../../models/dugnad');
 
 // TODO Add PUT
-// TODO Add DELETE  
+// TODO Add DELETE
 
 
 var routes = express.Router();
@@ -68,7 +68,7 @@ routes.post('/apply', (req, res) => {
   application = new Applied();
   query = "MATCH " + user.make_query_object('a') + ", " +
     dugnad.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
-    OR (a)-[:Member]->(b)) CREATE (a)-" +
+    CREATE (a)-" +
     application.make_query_object('c', {use_all: true}) + "->(b)";
   User.custom_query(query)
   .then((result) => {

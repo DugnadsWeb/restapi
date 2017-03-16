@@ -7,7 +7,7 @@ var Organization = function(args){
   Db_base.call(this);
 
   // Organization propperties
-  this.db_fields = Organization.db_blueprint;
+  this.db_fields = new Organization.db_blueprint();
 
   _init(this, args);
 
@@ -16,7 +16,7 @@ var Organization = function(args){
     if (db_fields.org_number.data.length == 9 &&
     	/^\d+$/.test(db_fields.org_number.data) &&
       db_fields.name.data.length > 3 &&
-      /^[a-zA-Z]+$/.test(db_fields.name.data) &&
+      /^[a-zA-Z\s]+$/.test(db_fields.name.data) &&
       db_fields.email.data.length > 5 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(db_fields.email.data) &&
       db_fields.phone.data.length >= 8 &&
@@ -27,11 +27,11 @@ var Organization = function(args){
   }
 
   function _init(me, args) {
-    fields = me.db_fields;
+    let fields = me.db_fields;
     if (!('uuid' in args)){
       fields['uuid'].data = uuid();
     }
-    for (arg in args){
+    for (let arg in args){
       if (arg in me.db_fields){
         fields[arg].data = args[arg]
       }
@@ -42,13 +42,13 @@ var Organization = function(args){
 
 Object.assign(Organization, Db_base);
 
-Organization.db_blueprint = {
-  uuid: new DbField(null, ['unique']),
-  org_number: new DbField(),
-  name: new DbField(),
-  email: new DbField(),
-  phone: new DbField(),
-  description: new DbField()
+Organization.db_blueprint = function(){
+  this.uuid = new DbField(null, ['unique']);
+  this.org_number = new DbField();
+  this.name = new DbField();
+  this.email = new DbField();
+  this.phone = new DbField();
+  this.description = new DbField();
 }
 
 

@@ -5,6 +5,7 @@ var routes = express.Router();
 var user = require('./user/user_routes');
 var auth = require('./auth/auth_routes');
 var organization = require('./org/organization_routes');
+var message = require('./message/message_routes');
 
 
 routes.all("/*", function(req, res, next){
@@ -27,5 +28,6 @@ routes.options("/*", function(req, res){
 routes.use('/user', user);
 routes.use('/auth', auth);
 routes.use('/org', organization);
+routes.use('/msg', message);
 
 module.exports = routes;
