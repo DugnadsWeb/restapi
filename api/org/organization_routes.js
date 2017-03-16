@@ -43,14 +43,38 @@ routes.get('/:uuid', (req, res) => {
 routes.get('/:uuid/applicants', (req, res) => {
   let org = new Organization(req.params);
   application = new Applied({status: true});
-  org.get_realations_of_type(User.name, application)
+  query = "MATCH " + org.make_query_object('a') +
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r";
+  Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send(result);
+    if (result.records.length == 0){
+      res.status(400).send({message: "Either the org does not exist or there are no applications"})
+    } else if (result.records[0].length == 3) {
+      console.log(result.records);
+      res.status(200).send(formatApplicationsReturn(result));
+    } else {
+      res.status(400).send({message: "Horrible error!"});
+    }
   })
   .catch((err) => {
+    console.log(err);
     res.status(400).send(err);
   });
 });
+
+// formats output
+function formatApplicationsReturn(result){
+  ret = []
+  for (let i=0;i<result.records.length;i++){
+    let application = {};
+    let record = result.records[i]._fields;
+    user = record[1].properties;
+    user.password = null;
+    let applied = record[2].properties;
+    ret.push({user: user, applied: applied});
+  }
+  return ret;
+}
 
 
 routes.get('/:uuid/members', (req, res) => {
@@ -75,10 +99,11 @@ routes.post('/', (req, res) => {
   var org = new Organization(req.body);
   org.create()
   .then((result) => {
-    res.status(200).send("Organization created");
+    res.status(200).send({msg: "Organization created"});
   })
   .catch((err) => {
     res.status(400).send(err);
+    console.log(err);
   });
 });
 
@@ -101,9 +126,17 @@ routes.post('/applicant', (req, res) => {
     query += "CREATE (a)-" + new Member().make_query_object('v', {use_all: true})
      + "->(b)";
   }
+  query += " RETURN a, b, r";
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send(result);
+    if (result.records.length == 0){
+      res.status(400).send({message:'Application does probably not exist'})
+    } else if (result.records[0].length == 3){
+      res.status(200).send(result);
+    } else {
+      res.status(400).send({message: 'Something is seriously wong!'});
+    }
+
   })
   .catch((err) => {
     res.status(400).send(err);

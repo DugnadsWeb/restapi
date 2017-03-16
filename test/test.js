@@ -150,7 +150,7 @@ describe('RestAPI', () => {
       it('Should return a 200 status', (done) => {
         var test_org = {
           org_number: "014857284",
-          name: "et idrettslag",
+          org_name: "et idrettslag",
           email: "etidrettslag@sport.no",
           phone: "94857357",
           description: "Dette er et idrettslag for sport"
