@@ -75,10 +75,11 @@ routes.post('/', (req, res) => {
   var org = new Organization(req.body);
   org.create()
   .then((result) => {
-    res.status(200).send("Organization created");
+    res.status(200).send({msg: "Organization created"});
   })
   .catch((err) => {
     res.status(400).send(err);
+    console.log(err);
   });
 });
 
