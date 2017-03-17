@@ -150,7 +150,7 @@ describe('RestAPI', () => {
       it('Should return a 200 status', (done) => {
         var test_org = {
           org_number: "014857284",
-          name: "et idrettslag",
+          org_name: "et idrettslag",
           email: "etidrettslag@sport.no",
           phone: "94857357",
           description: "Dette er et idrettslag for sport"
@@ -200,6 +200,146 @@ describe('RestAPI', () => {
             .get('/api/org/6d99419c-9b37-4fd4-b06c-baf859b6a66f')
             .end((err, res) => {
               expect(res).to.have.status(400)
+              done();
+            })
+        })
+      })
+    })
+    describe('POST application to organization', () => {
+      it('Should return a 200', done => {
+        Environment().then(env => {
+          chai.request('http://localhost:8888')
+            .post('/api/org/apply')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': env.get_random_user().get_db_fields().email},
+              'org': { 'uuid': env.get_random_org().get_db_fields().uuid}
+            })
+            .end((err, res) => {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              done();
+            })
+        })
+      })
+    })
+    describe('POST application to organization with nonexisting user', () => {
+      it('Should return a 400', done => {
+        Environment().then(env => {
+          chai.request('http://localhost:8888')
+            .post('/api/org/apply')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': 'this_mail@does_not.exist'},
+              'org': { 'uuid': env.get_random_org().get_db_fields().uuid}
+            })
+            .end((err, res) => {
+              expect(res).to.have.status(400);
+              done();
+            })
+        })
+      })
+    })
+    describe('POST application to organization with nonexisting organization', () => {
+      it('Should return a 400', done => {
+        Environment().then(env => {
+          chai.request('http://localhost:8888')
+            .post('/api/org/apply')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': env.get_random_user().get_db_fields().email},
+              'org': { 'uuid': 'thid is not even a real uuid'}
+            })
+            .end((err, res) => {
+              expect(res).to.have.status(400);
+              done();
+            })
+        })
+      })
+    })
+    describe('GET all application for an organization', () => {
+      it('Should return a 200 and list of applications', done => {
+        Environment().then(env => {
+          let org = env.get_random_org();
+          chai.request('http://localhost:8888')
+            .get('/api/org/'+org.get_db_fields().uuid+'/applicants')
+            .set('Content-Type', 'application/json')
+            .end((err, res) => {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              expect(res.body).to.have.length(env.get_org_applications(org).length);
+              done();
+            })
+        })
+      })
+    })
+    describe('GET all application for an nonexisting organization', () => {
+      it('Should return a 400', done => {
+        Environment().then(env => {
+          chai.request('http://localhost:8888')
+            .get('/api/org/thisisnotanuuid/applicants')
+            .set('Content-Type', 'application/json')
+            .end((err, res) => {
+              expect(res).to.have.status(400);
+              done();
+            })
+        })
+      })
+    })
+    describe('POST accept application', () => {
+      it('Should return a 200', done => {
+        Environment().then(env => {
+          let applic = env.get_random_application();
+          chai.request('http://localhost:8888')
+            .post('/api/org/applicant')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': applic.user.get_db_fields().email},
+              'org': { 'uuid': applic.org.get_db_fields().uuid},
+              'accept': true
+            })
+            .end((err, res) => {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              done();
+            })
+        })
+      })
+    })
+    describe('POST reject application', () => {
+      it('Should return a 200', done => {
+        Environment().then(env => {
+          let applic = env.get_random_application();
+          chai.request('http://localhost:8888')
+            .post('/api/org/applicant')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': applic.user.get_db_fields().email},
+              'org': { 'uuid': applic.org.get_db_fields().uuid},
+              'accept': false
+            })
+            .end((err, res) => {
+              expect(err).to.be.null;
+              expect(res).to.have.status(200);
+              done();
+            })
+        })
+      })
+    })
+    describe('POST accept application with nonexisting user', () => {
+      it('Should return a 400', done => {
+        Environment().then(env => {
+          let applic = env.get_random_application();
+          chai.request('http://localhost:8888')
+            .post('/api/org/applicant')
+            .set('Content-Type', 'application/json')
+            .send({
+              'user': { 'email': 'thisisnot@real.user'},
+              'org': { 'uuid': applic.org.get_db_fields().uuid},
+              'accept': false
+            })
+            .end((err, res) => {
+              expect(res).to.have.status(400);
               done();
             })
         })

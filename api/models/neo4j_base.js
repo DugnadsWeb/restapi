@@ -32,7 +32,6 @@ var db_base = function(){
     return new Promise((res, rej) => {
       if (this.validate(this.db_fields)){
         var query = "CREATE " + this.make_query_object('a', {use_all: true});
-        console.log(query);
         var session = driver.session();
         session.run(query)
           .then((result) => {
@@ -124,7 +123,6 @@ var db_base = function(){
         query = "MATCH " + this.make_query_object('a') +
         "-" + relationship.make_query_object('b', {use_all: true}) + "-(c:" + type + ") return b, c";
         let session = driver.session();
-        console.log(query);
         session.run(query)
         .then((result) => {
           session.close();
@@ -197,7 +195,6 @@ var db_base = function(){
       console.log(relationship);
     query += " CREATE " + (options.unique ? "UNIQUE" : "") +
       " (a)-" + relationship.make_query_object('r', {use_all: true}) + "->(b) return r";
-    console.log(query);
     return query;
   }
 
@@ -248,9 +245,9 @@ db_base.get_unique = function(unique_id){
 
 db_base._get_from_unique_identifier_query = function(id){
   query = "MATCH (a:" + this.name + "{ "
-
-  for (prop in this.db_blueprint){
-      if (this.db_blueprint[prop].meta.includes("unique")){
+  let bp = new this.db_blueprint();
+  for (prop in bp){
+      if (bp[prop].meta.includes("unique")){
         query += prop + ": \"" + id + "\"";
       }
     }

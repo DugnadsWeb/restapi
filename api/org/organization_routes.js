@@ -43,14 +43,38 @@ routes.get('/:uuid', (req, res) => {
 routes.get('/:uuid/applicants', (req, res) => {
   let org = new Organization(req.params);
   application = new Applied({status: true});
-  org.get_realations_of_type(User.name, application)
+  query = "MATCH " + org.make_query_object('a') +
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r";
+  Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send(result);
+    if (result.records.length == 0){
+      res.status(400).send({message: "Either the org does not exist or there are no applications"})
+    } else if (result.records[0].length == 3) {
+      console.log(result.records);
+      res.status(200).send(formatApplicationsReturn(result));
+    } else {
+      res.status(400).send({message: "Horrible error!"});
+    }
   })
   .catch((err) => {
+    console.log(err);
     res.status(400).send(err);
   });
 });
+
+// formats output
+function formatApplicationsReturn(result){
+  ret = []
+  for (let i=0;i<result.records.length;i++){
+    let application = {};
+    let record = result.records[i]._fields;
+    user = record[1].properties;
+    user.password = null;
+    let applied = record[2].properties;
+    ret.push({user: user, applied: applied});
+  }
+  return ret;
+}
 
 
 routes.get('/:uuid/members', (req, res) => {
@@ -75,10 +99,11 @@ routes.post('/', (req, res) => {
   var org = new Organization(req.body);
   org.create()
   .then((result) => {
-    res.status(200).send("Organization created");
+    res.status(200).send({msg: "Organization created"});
   })
   .catch((err) => {
     res.status(400).send(err);
+    console.log(err);
   });
 });
 
@@ -86,14 +111,14 @@ routes.post('/', (req, res) => {
 * Request body:
 *   {
 *     "user": { "email": email@internetz.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid },
+*     "org": { uuid: this-is-not-a-real-uuid },
 *     "accept:" true/false
 *   }
 * TODO edit response
 */
 routes.post('/applicant', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   let query = "MATCH " + user.make_query_object('a') + "-" +
     "[r:Applied {status: 'true'}]->" + org.make_query_object('b') +
     "SET r.status = 'false' ";
@@ -101,9 +126,17 @@ routes.post('/applicant', (req, res) => {
     query += "CREATE (a)-" + new Member().make_query_object('v', {use_all: true})
      + "->(b)";
   }
+  query += " RETURN a, b, r";
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send(result);
+    if (result.records.length == 0){
+      res.status(400).send({message:'Application does probably not exist'})
+    } else if (result.records[0].length == 3){
+      res.status(200).send(result);
+    } else {
+      res.status(400).send({message: 'Something is seriously wong!'});
+    }
+
   })
   .catch((err) => {
     res.status(400).send(err);
@@ -113,13 +146,13 @@ routes.post('/applicant', (req, res) => {
 /* Set admin
 *   Request body: {
 *     "user" { email: email@interwebs.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid },
+*     "org": { uuid: this-is-not-a-real-uuid },
 *     "admin": true/false // true to set admin, false to revoke
 *  TODO edit query to not remove admin if one admin remains
 */
 routes.post('/chadmin', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   query = "MATCH " + user.make_query_object('a') +
     "-[c:Member]->" + org.make_query_object('b') +
     "SET c += {is_admin: '" + req.body.admin + "'} RETURN a";
@@ -137,12 +170,12 @@ routes.post('/chadmin', (req, res) => {
 /* Remove member
 *   Request body: {
 *     "user" { email: email@interwebs.tld },
-*     "organization": { uuid: this-is-not-a-real-uuid }
+*     "org": { uuid: this-is-not-a-real-uuid }
 * TODO edit query to not remove member if member is last admin
 */
 routes.post('/rmmember', (req, res) => {
   let user = new User(req.body.user);
-  let org = new Organization(req.body.organization);
+  let org = new Organization(req.body.org);
   query = "MATCH " + user.make_query_object('a') +
     "-[c:Member]->" + org.make_query_object('b') +
     "DELETE c";
@@ -155,6 +188,48 @@ routes.post('/rmmember', (req, res) => {
     res.status(400).send(err);
   })
 })
+
+/*
+* Apply to organisation
+*   Request body:
+*    "user": {
+*      "email": "email@interwebs.tld"
+*    },
+*    "org": {
+*      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
+*    }
+* TODO maybe move this functionality to organization org/apply
+* Query : Matches User and Organization with given keys and creates a
+*   relationship if a user and organization is found, and the user does not have
+*   an active application or is not already a member.
+*/
+routes.post('/apply', (req, res) => {
+  if(!req.body.user || !req.body.org){
+    res.status(400).send('Malformed request body');
+    return;
+  }
+  user = new User(req.body.user);
+  org = new Organization(req.body.org);
+  application = new Applied();
+  query = "MATCH " + user.make_query_object('a') + ", " +
+    org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
+    OR (a)-[:Member]->(b)) CREATE (a)-" +
+    application.make_query_object('c', {use_all: true}) + "->(b) RETURN a, b, c";
+  User.custom_query(query)
+  .then((result) => {
+    if (result.records.length == 0){
+      res.status(400).send('User and Organization does not exist, ' +
+        'or user is already a member or has an active application');
+    } else if (result.records[0].length == 3){
+      res.status(200).send("Application sent");
+    } else {
+      res.status(400).send("Something is wrong, this should not happen!");
+    }
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
 
 
 module.exports = routes;
