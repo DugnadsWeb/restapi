@@ -25,7 +25,7 @@ routes.post('/', (req, res) => {
           token: token
         });
       })
-    } else {
+    } else{
       res.status(400).send({
         success: false,
         message: 'authentication failed'

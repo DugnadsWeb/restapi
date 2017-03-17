@@ -13,14 +13,15 @@ var Organization = function(args){
 
   // TODO test for regexp
   this.validate = function(db_fields){
-    if (db_fields.org_number.data.length == 9 &&
+    if (db_fields.org_number.data.length == 9 &&	
     	/^\d+$/.test(db_fields.org_number.data) &&
       db_fields.name.data.length > 3 &&
       /^[a-zA-Z]+$/.test(db_fields.name.data) &&
       db_fields.email.data.length > 5 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(db_fields.email.data) &&
       db_fields.phone.data.length >= 8 &&
-      /^\d+$/.test(db_fields.phone.data)){
+      /^\d+$/.test(db_fields.phone.data)
+      ){
         return true;
       }
       return false;

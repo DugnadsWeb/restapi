@@ -3,7 +3,7 @@
   "main": "server.js",
   "scripts": {
     "test": "npm run clear && mocha",
-    "clear": "nodejs clear_db.js -r"
+    "clear": "node clear_db.js -r"
   },
   "dependencies": {
     "body-parser": "^1.16.0",
