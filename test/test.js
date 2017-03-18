@@ -260,7 +260,7 @@ describe('RestAPI', () => {
     describe('GET all application for an organization', () => {
       it('Should return a 200 and list of applications', done => {
         Environment().then(env => {
-          let org = env.get_random_org();
+          let org = env.get_random_application().org;
           chai.request('http://localhost:8888')
             .get('/api/org/'+org.get_db_fields().uuid+'/applicants')
             .set('Content-Type', 'application/json')

@@ -12,7 +12,7 @@ var RelationshipBase = function(){
     options = !!options ? options : {}
     let query = "[" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
     for (var field in this.db_fields){
-      if (!!this.db_fields[field].data){
+      if (this.db_fields[field].data !== undefined && this.db_fields[field].data !== null){
         if (this.db_fields[field].meta.indexOf('unique') != -1 ||
           this.db_fields[field].meta.indexOf('use') != -1 ||
           options.use_all){
