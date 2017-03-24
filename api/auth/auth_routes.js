@@ -18,7 +18,7 @@ routes.post('/', (req, res) => {
     } else {
       buildReturnObject(actual_user).then(returnObj => {
         jwt.sign(returnObj, config.secret, {}, (err, token) => {
-          console.log(err);
+          if (!!err) {console.log(err);}
           res.status(200)
             .send({
             success: true,

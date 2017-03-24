@@ -77,10 +77,23 @@ function formatApplicationsReturn(result){
 }
 
 
-routes.get('/:uuid/members', (req, res) => {
+routes.get('/members/:uuid', (req, res) => {
   let org = new Organization(req.params);
-  query = "MATCH ()"
+  query = "MATCH " + org.make_query_object('a') + "<-[r:Member]-(b:User) " +
+  "RETURN r, b";
+  Organization.custom_query(query).then(result => {
+    console.log(result);
+    if (result.records.length == 0){
+      res.status(404).send({message:"No members found"});
+    } else {
+      res.status(200).send(r)
+    }
+  })
 });
+
+function formatMemberReturn(){
+  
+}
 
 
 // #######

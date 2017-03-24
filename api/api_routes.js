@@ -1,5 +1,8 @@
-var express = require('express');
-var routes = express.Router();
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const config = require('../config');
+const routes = express.Router();
+
 
 // api Routes
 var user = require('./user/user_routes');
@@ -24,9 +27,30 @@ routes.options("/*", function(req, res){
   res.sendStatus(200);
 });
 
-
-routes.use('/user', user);
+// open apis
 routes.use('/auth', auth);
+
+// api lockdown middleware
+routes.use((req, res, next) => {
+    if (req.url == '/user/' && req.method == 'POST'){
+        next();
+        return
+    }
+    if ('authorization' in req.headers){
+      let token = req.headers.authorization.substring(7);
+      jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+          res.send(401).send({message: "Token is invalid, log in and out"});
+          return;
+        }
+        console.log('valid token :D');
+        req.auth_token = decoded;
+      })
+    }
+    next();
+})
+// token locked apis
+routes.use('/user', user);
 routes.use('/org', organization);
 routes.use('/msg', message);
 
