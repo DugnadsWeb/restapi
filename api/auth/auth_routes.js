@@ -46,6 +46,7 @@ function buildReturnObject(actual_user){
       result.records.forEach((member) => {
         actual_user.memberships.push({uuid:member._fields[1], is_admin:member._fields[0]})
       })
+      console.log(actual_user);
       res(actual_user);
     }).catch(err => {
       rej(err);

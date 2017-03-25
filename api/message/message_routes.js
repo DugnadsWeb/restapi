@@ -12,8 +12,8 @@ routes.get('/', (req, res) => {
 
 /* POST message to entity
 *   Request body: {
-*     "sender": {"type": "senderEntity", "id"},  // user, organization
-*     "receiver": {"type": "receiverEntity", "unique_id"}, // user, organisation, dugnad
+*     "sender": {"type": "senderEntity", "id"},  // user, org
+*     "receiver": {"type": "receiverEntity", "unique_id"}, // user, org, dugnad
 *     "message": "Message body"
 *   }
 *   senderEntity and receiverEntity are entities that can send and receive messages.
