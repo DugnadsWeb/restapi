@@ -224,7 +224,7 @@ routes.post('/rmmember', (req, res) => {
 *    "org": {
 *      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
 *    }
-* TODO maybe move this functionality to organization org/apply
+*
 * Query : Matches User and Organization with given keys and creates a
 *   relationship if a user and organization is found, and the user does not have
 *   an active application or is not already a member.

@@ -14,13 +14,14 @@ var routes = express.Router();
 
 
 
-// GET
+// GET all
 routes.get('/', (req, res) => {
   User.read_all_from_class((status, message) => {
     res.status(status).send(message);
   })
 });
 
+// GET unique user
 routes.get('/:email', (req, res) => {
   User.get_unique(req.params.email)
   .then((user) => {
@@ -30,6 +31,30 @@ routes.get('/:email', (req, res) => {
     res.status(400).send(err);
   });
 });
+
+// GET users active org applications
+routes.get('/applications/:email', (req, res) => {
+  let user = new User(req.params);
+  query = "MATCH " + user.make_query_object('a') +
+    "-[:Applied {status: 'true'}]->(b:Organization) " +
+    "RETURN b";
+  User.custom_query(query)
+  .then(ret => {
+    res.status(200).send(formatActiveApplications(ret));
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
+
+function formatActiveApplications(dbRet){
+  console.log(dbRet.records[0]);
+  let ret = [];
+  for (let i=0;i<dbRet.records.length;i++){
+    ret.push(dbRet.records[i]._fields[0].properties.uuid);
+  }
+  return ret;
+}
 
 
 
