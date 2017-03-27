@@ -70,33 +70,7 @@ routes.post('/me', (req,res) => {
 
 	//res.send(decoded);
 });
-/*
-* Apply to organisation
-*   Request body:
-*    "user": {
-*      "email": "email@interwebs.tld"
-*    },
-*    "organisation": {
-*      "uuid": "9a7210e3-395b-43bc-a92d-4fbb24e1aa81"
-*    }
-* TODO maybe move this functionality to organization org/apply
-*/
-routes.post('/join', (req, res) => {
-  user = new User(req.body.user);
-  org = new Organization(req.body.organization);
-  application = new Applied();
-  query = "MATCH " + user.make_query_object('a') + ", " +
-    org.make_query_object('b') + " WHERE NOT ((a)-[:Applied {status: 'true'}]->(b) \
-    OR (a)-[:Member]->(b)) CREATE (a)-" +
-    application.make_query_object('c', {use_all: true}) + "->(b)";
-  User.custom_query(query)
-  .then((result) => {
-    res.status(200).send("Application submitted");
-  })
-  .catch((err) => {
-    res.status(200).send(err);
-  });
-});
+
 
 // PUT
 /*

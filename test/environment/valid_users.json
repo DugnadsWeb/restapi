@@ -16,5 +16,18 @@
     "last_name": "Jimsen",
     "email": "JimmyJ@dugnad.no",
     "password": "sdbsd52345g"
+  },
+  {
+    "first_name": "Stian",
+    "last_name": "Krullerud",
+    "email": "skrulle@msn.com",
+    "password": "passord"
+  },
+  {
+    "first_name": "Tina",
+    "last_name": "Østad",
+    "email": "tøsta@yahoo.no",
+    "password": "passord"
   }
+
 ]

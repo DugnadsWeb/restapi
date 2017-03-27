@@ -3,6 +3,7 @@ const orgs_data = require('./valid_organizations.json');
 const User = require('../../api/models/user');
 const Organization = require('../../api//models/organization');
 const Applied = require('../../api/models/relationships/applied');
+const Member = require('../../api/models/relationships/member');
 
 function Environment(){
 
@@ -27,6 +28,11 @@ function Environment(){
   this.get_random_application = function(){
     let rand = Math.floor(Math.random() * this.applications.length);
     return this.applications[rand];
+  }
+
+  this.get_random_application_and_remove = function(){
+    let rand = Math.floor(Math.random() * this.applications.length);
+    return this.applications.splice(rand, 1)[0];
   }
 
   this.get_random_unused_application_pair = function(){
@@ -80,7 +86,13 @@ function populateEnvironment(){
       // then add applicants
       addMembershipApplications(env)
       .then(ret => {
-        res(env);
+        acceptMembershipAllpications(env)
+        .then(ret => {
+          res(env);
+        })
+        .catch(err => {
+          rej(err);
+        })
       })
       .catch(err => {
         rej(err);
@@ -135,7 +147,7 @@ function addValidOrganizations(env){
 function addMembershipApplications(env){
   return new Promise((res, rej) => {
     var promise_pool = [];
-    for (var i=0;i<3;i++){
+    for (var i=0;i<6;i++){
       let pair = env.get_random_unused_application_pair();
       env.applications.push(pair);
       //console.log(pair.user.get_db_fields().first_name + ' : ' +
@@ -157,6 +169,28 @@ function addMembershipApplications(env){
   })
 }
 
+function acceptMembershipAllpications(env){
+  return new Promise((res, rej) => {
+    let promise_pool = [];
+    for (let i=0;i<3;i++){
+      let application = env.get_random_application_and_remove();
+      let query_set = "MATCH " + application.user.make_query_object('a') + "-" +
+        "[r:Applied {status: 'true'}]->" + application.org.make_query_object('b') +
+        "SET r.status = 'false' ";
+      let query_create = "MATCH " + application.user.make_query_object('a') + ", " +
+        application.org.make_query_object('b') + " CREATE (a)-" +
+        new Member().make_query_object('v', {use_all: true}) + "->(b)";
+      promise_pool.push(User.custom_query(query_set));
+      promise_pool.push(User.custom_query(query_create));
+    }
+    Promise.all(promise_pool).then(result => {
+      res();
+    }).catch(err => {
+      console.log(err);
+      rej(err);
+    })
+  })
+}
 
 // will run from console given argument 'make'
 for (let i=0;i<process.argv.length;i++){

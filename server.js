@@ -24,6 +24,10 @@ neo4j();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// disable 304
+app.disable('etag');
+
+
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 

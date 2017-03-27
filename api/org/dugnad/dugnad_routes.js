@@ -34,12 +34,16 @@ routes.get('/:uuid', (req, res) => {
 
 /* Make dugnad
 *   Request body: {
-*     "title": "my_dugnads_name",
-*     "status": "status_of_dugnad", // pre-planning, planning, ongoing, finished
-*     "start_time": "when_my_event_will_start",
-*     "end_time": "when_my_event_will_end",
-*     "description": "what_is_my_event_all_about",
-*     "max_partisipants": "max_number_of_possitions" // 0 for infinite
+      "dugnad": {
+*       "title": "my_dugnads_name",
+*       "status": "status_of_dugnad", // pre-planning, planning, ongoing, finished
+*       "start_time": "when_my_event_will_start",
+*       "end_time": "when_my_event_will_end",
+*       "description": "what_is_my_event_all_about",
+*       "max_partisipants": "max_number_of_possitions" // 0 for infinite
+*     },
+*     "user": {"email": "email@domail.tld"},
+*     "org":  {"uuid": "someuuid"}
 */
 routes.post('/', (req, res) => {
   dugnad = new Dugnad(req.body);
