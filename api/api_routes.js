@@ -40,7 +40,7 @@ routes.use((req, res, next) => {
       let token = req.headers.authorization.substring(7);
       jwt.verify(token, config.secret, (err, decoded) => {
         if (err) {
-          res.send(401).send({message: "Token is invalid, log in and out"});
+          res.status(401).send({message: "Token is invalid, log in and out"});
           return;
         }
         console.log('valid token :D');
