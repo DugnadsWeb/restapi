@@ -13,10 +13,10 @@ var Organization = function(args){
 
   // TODO test for regexp
   this.validate = function(db_fields){
-    if (db_fields.org_number.data.length == 9 &&
-    	/^\d+$/.test(db_fields.org_number.data) &&
-      db_fields.org_name.data.length > 3 &&
-      /^[a-zA-ZæøåÆØÅ\s]+$/.test(db_fields.org_name.data) &&
+    if (db_fields.orgNumber.data.length == 9 &&
+    	/^\d+$/.test(db_fields.orgNumber.data) &&
+      db_fields.orgName.data.length > 3 &&
+      /^[a-zA-ZæøåÆØÅ\s]+$/.test(db_fields.orgName.data) &&
       db_fields.email.data.length > 5 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(db_fields.email.data) &&
       db_fields.phone.data.length >= 8 &&
@@ -45,8 +45,8 @@ Object.assign(Organization, Db_base);
 
 Organization.db_blueprint = function(){
   this.uuid = new DbField(null, ['unique']);
-  this.org_number = new DbField();
-  this.org_name = new DbField();
+  this.orgNumber = new DbField();
+  this.orgName = new DbField();
   this.email = new DbField();
   this.phone = new DbField();
   this.description = new DbField();

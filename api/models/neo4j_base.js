@@ -77,6 +77,7 @@ var db_base = function(){
       var query = "MATCH " + this.make_query_object('a') +
         build_update_query(edited_object);
       var session = driver.session();
+      console.log(query);
       session.run(query)
         .then(() => {
           session.close();

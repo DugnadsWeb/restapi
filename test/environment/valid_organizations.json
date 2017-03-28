@@ -1,42 +1,42 @@
 [
   {
-    "org_number": "012345678",
-    "org_name": "Halden IL",
+    "orgNumber": "012345678",
+    "orgName": "Halden IL",
     "email": "haldenil@whatever.no",
     "phone": "99887766",
     "description": "Dette er en beskrivelse av hva som skjer i Halden IL"
   },
   {
-    "org_number": "584950694",
-    "org_name": "En eller annen klubb",
+    "orgNumber": "584950694",
+    "orgName": "En eller annen klubb",
     "email": "en_email@provider.no",
     "phone": "43454476",
     "description": "Dette er en beskrivelse av hva som skjer i En eller annen klub"
   },
   {
-    "org_number": "837465395",
-    "org_name": "Mere FK",
+    "orgNumber": "837465395",
+    "orgName": "Mere FK",
     "email": "mere@fotball.tld",
     "phone": "43456567",
     "description": "Vi driver med fotball og dugnad"
   },
   {
-    "org_number": "012345678",
-    "org_name": "Speider Gruppa",
+    "orgNumber": "012345678",
+    "orgName": "Speider Gruppa",
     "email": "super@speider.uk",
     "phone": "93485864",
     "description": "Ubevoktede barn i skogen"
   },
   {
-    "org_number": "024567855",
-    "org_name": "Vigilante Super Squad",
+    "orgNumber": "024567855",
+    "orgName": "Vigilante Super Squad",
     "email": "dead@pool.org",
     "phone": "93334300",
     "description": "You call we'll f*ck 'em up good, real good!"
   },
   {
-    "org_number": "024696955",
-    "org_name": "Slutbus Car wash",
+    "orgNumber": "024696955",
+    "orgName": "Slutbus Car wash",
     "email": "soapgirl@slutbus.xxx",
     "phone": "46434343",
     "description": "We're here to satisfy all your car wash needs, ALL your needs"

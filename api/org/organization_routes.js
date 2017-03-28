@@ -34,27 +34,24 @@ routes.get('/:uuid', (req, res) => {
     res.status(200).send(result);
   })
   .catch((err) => {
-    console.log(err);
-    res.status(400).send(err);
+    if (err == "No results found"){
+      res.status(404).send(err);
+    } else {
+      res.status(400).send(err);
+    }
   });
 });
 
 // Returns list of active applicants
-routes.get('/:uuid/applicants', (req, res) => {
+routes.get('/applicants/:uuid', (req, res) => {
   let org = new Organization(req.params);
   application = new Applied({status: true});
   query = "MATCH " + org.make_query_object('a') +
-    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r";
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r \
+    ORDER BY r.applied_date ASC";
   Organization.custom_query(query)
   .then((result) => {
-    if (result.records.length == 0){
-      res.status(400).send({message: "Either the org does not exist or there are no applications"})
-    } else if (result.records[0].length == 3) {
-      console.log(result.records);
       res.status(200).send(formatApplicationsReturn(result));
-    } else {
-      res.status(400).send({message: "Horrible error!"});
-    }
   })
   .catch((err) => {
     console.log(err);
@@ -82,11 +79,7 @@ routes.get('/members/:uuid', (req, res) => {
   query = "MATCH " + org.make_query_object('a') + "<-[r:Member]-(b:User) " +
   "RETURN r, b";
   Organization.custom_query(query).then(result => {
-    if (result.records.length == 0){
-      res.status(404).send({message:"No members found"});
-    } else {
-      res.status(200).send(formatMemberReturn(result));
-    }
+    res.status(200).send(formatMemberReturn(result));
   })
   .catch(err => {
     res.status(400).send(err);
@@ -115,7 +108,7 @@ function formatMemberReturn(result){
 
 /* Create user
 *   Request body: {
-*     "org_number": "my_nine_digit_org_number",
+*     "orgNumber": "my_nine_digit_orgNumber",
 *     "name": "my_orgs_name",
 *     "email": "my_orgs_email@domain.tld",
 *     "phone": "my_orgs_phone_number",
@@ -255,6 +248,36 @@ routes.post('/apply', (req, res) => {
   .catch((err) => {
     res.status(400).send(err);
   });
+});
+
+
+// #######
+// PUT ###
+// #######
+
+// PUT
+/*
+* Edit user info
+*   Request body {
+*     "org": { user fileds to change }
+*   }
+*/
+routes.put('/', (req, res) => {
+
+  if (!req.body.org) {
+    res.status(400).send({message:"request body is incomplete"});
+    return;
+  }
+  var org = new Organization(req.body.org);
+  console.log(org);
+  // reson for taking itself as an argument: it is intentded for objects that can mutate its own unique id
+  org.update(org)
+  .then((result) => {
+    res.status(200).send({message: "Organization updated"});
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
 });
 
 

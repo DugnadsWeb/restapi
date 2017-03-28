@@ -64,8 +64,8 @@ function formatActiveApplications(dbRet){
 
 /* Create user
 *   Request body: {
-*     "first_name": "my_first_name",
-*     "last_name": "my_last_name",
+*     "firstName": "my_firstName",
+*     "lastName": "my_lastName",
 *     "email": "my_email@domain.tld",
 *     "password": "my_super_safe_pw"
 *   }

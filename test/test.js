@@ -56,8 +56,8 @@ describe('RestAPI', () => {
     describe('POST valid user', () => {
       it('Should return a 200 status', (done) => {
         var test_user = {
-          first_name: "Britt Arne",
-          last_name: "Bergrud",
+          firstName: "Britt Arne",
+          lastName: "Bergrud",
           email: "britta@undergang.no",
           password: "morrobritt"
         };
@@ -91,8 +91,8 @@ describe('RestAPI', () => {
       it('Should return a 200 status', (done) => {
         Environment().then(env => {
           user = env.get_random_user();
-          user.db_fields.first_name.data = "yoloswag";
-          user.db_fields.last_name.data = "G-bsen";
+          user.db_fields.firstName.data = "yoloswag";
+          user.db_fields.lastName.data = "G-bsen";
           user.db_fields.password.data = "imanewpassword";
           chai.request('http://localhost:8888')
           .put('/api/user')
@@ -126,8 +126,8 @@ describe('RestAPI', () => {
       it('Should return a 400', (done) => {
         Environment().then(env => {
           var test_user = {
-            first_name: "Britt Arne",
-            last_name: "Bergrud",
+            firstName: "Britt Arne",
+            lastName: "Bergrud",
             email: "britta@undergang.no",
             password: "morrobritt"
           };
@@ -149,8 +149,8 @@ describe('RestAPI', () => {
     describe('POST valid organization', () => {
       it('Should return a 200 status', (done) => {
         var test_org = {
-          org_number: "014857284",
-          org_name: "et idrettslag",
+          orgNumber: "014857284",
+          orgName: "et idrettslag",
           email: "etidrettslag@sport.no",
           phone: "94857357",
           description: "Dette er et idrettslag for sport"

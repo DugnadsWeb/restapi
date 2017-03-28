@@ -150,7 +150,7 @@ function addMembershipApplications(env){
     for (var i=0;i<6;i++){
       let pair = env.get_random_unused_application_pair();
       env.applications.push(pair);
-      //console.log(pair.user.get_db_fields().first_name + ' : ' +
+      //console.log(pair.user.get_db_fields().firstName + ' : ' +
       //            pair.org.get_db_fields().name);
       let application = new Applied();
 
