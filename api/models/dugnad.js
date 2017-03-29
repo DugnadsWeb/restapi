@@ -8,16 +8,7 @@ var Dugnad = function(args){
   Db_base.call(this);
 
 
-  this.db_fields = {
-    uuid: new DbField(null, ['unique']),
-    title: new DbField(),
-    location: new DbField(),
-    status: new DbField(),
-    start_time: new DbField(),
-    end_time: new DbField(),
-    description: new DbField(),
-    max_partisipants: new DbField()
-  }
+  this.db_fields = new Dugnad.db_blueprint();
 
   _init(this, args);
 
@@ -35,14 +26,25 @@ var Dugnad = function(args){
     if (!('uuid' in args)){
       fields['uuid'].data = uuid();
     }
-    for (field in fields){
-      if (field in args){
-        fields[field].data = args[field];
+    for (arg in args){
+      if (arg in me.db_fields){
+        fields[arg].data = args[arg];
       }
     }
   }
 }
 
 Object.assign(Dugnad, Db_base);
+
+Dugnad.db_blueprint = function(){
+  this.uuid = new DbField(null, ['unique']),
+  this.title = new DbField(),
+  this.location = new DbField(),
+  this.status = new DbField(),
+  this.start_time = new DbField(),
+  this.end_time = new DbField(),
+  this.description = new DbField(),
+  this.max_partisipants = new DbField()
+}
 
 module.exports = Dugnad;

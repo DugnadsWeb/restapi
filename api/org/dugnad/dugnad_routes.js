@@ -46,10 +46,23 @@ routes.get('/:uuid', (req, res) => {
 *     "org":  {"uuid": "someuuid"}
 */
 routes.post('/', (req, res) => {
-  dugnad = new Dugnad(req.body);
+  let dugnad = new Dugnad(req.body.dugnad);
+  let org = new Organization(req.body.org);
   dugnad.create()
   .then((result) => {
-    res.status(200).send("Object created");
+    query = "MATCH " + dugnad.make_query_object('a') +
+    ", " + org.make_query_object('b') + 
+    "CREATE " + "(b)-[:Owns]->(a) RETURN a, b";
+    Dugnad.custom_query(query).then(ret => {
+      if (ret.records.length == 1){
+        res.status(200).send({message: "Dugnad created"});
+      } else {
+        res.status(400).send({message: "Something is wrong!"});
+      }
+    })
+    .catch(err => {
+      res.status(400).send(err);
+    })
   })
   .catch((err) => {
     res.status(400).send(err);
