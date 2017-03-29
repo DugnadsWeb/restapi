@@ -3,7 +3,7 @@ var User = require('../models/user');
 var Organization = require('../models/organization');
 var Applied = require('../models/relationships/applied');
 var Member = require('../models/relationships/member');
-var dugnad_routes = require('./dugnad/dugnad_routes');
+
 
 
 // TODO add PUT
@@ -13,7 +13,7 @@ var routes = express.Router();
 
 
 
-routes.use('/dugnad', dugnad_routes);
+
 
 // ######
 // GET ##
