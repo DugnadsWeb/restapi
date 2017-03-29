@@ -193,7 +193,7 @@ routes.post('/chadmin', (req, res) => {
   console.log(query);
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send("Admin rights " + (req.body.admin? "granted" : "revoked"));
+    res.status(200).send({message:"Admin rights " + (req.body.admin? "granted" : "revoked")});
   })
   .catch((err) => {
     res.status(400).send(err);
@@ -216,7 +216,7 @@ routes.post('/rmmember', (req, res) => {
   console.log(query);
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send("Memeber removed");
+    res.status(200).send({message: "Memeber removed"});
   })
   .catch((err) => {
     res.status(400).send(err);
