@@ -1,12 +1,12 @@
 var express = require('express');
-var User = require('../../models/user');
-var Organization = require('../../models/organization');
-var Applied = require('../../models/relationships/applied');
-var Member = require('../../models/relationships/member');
-var Dugnad = require('../../models/dugnad');
+var User = require('../models/user');
+var Organization = require('../models/organization');
+var Applied = require('../models/relationships/applied');
+var Member = require('../models/relationships/member');
+var Dugnad = require('../models/dugnad');
 
 // TODO Add PUT
-// TODO Add DELETE? delete nothing, agregate everything 
+// TODO Add DELETE? delete nothing, agregate everything
 
 
 var routes = express.Router();
