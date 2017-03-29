@@ -47,6 +47,11 @@ routes.get('/applications/:email', (req, res) => {
   });
 });
 
+//GET users profilepicture
+routes.get('/:picture', (req, res) => {
+	let user = new User(req.params);
+});
+
 function formatActiveApplications(dbRet){
   console.log(dbRet.records[0]);
   let ret = [];
@@ -81,19 +86,29 @@ routes.post('/', (req, res) => {
   })
 });
 
+//Upload profile picture for user
+
+routes.post('/picture', (req,res) => {
+  var user = new User(req.body.user);
+  query = "MATCH " + user.make_query_object('a') +
+    "-[:Has]->(b:ProfileImage{base64:" + reg.body.base64 + "}) " +
+    "RETURN b";
+  User.custom_query(query)
+  .then((ret) => {
+  	 res.status(200).send(ret);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
 
 // TODO trenger vi egentlig denne, kan egentlig sende med brukerinfo under innlogging
 routes.post('/me', (req,res) => {
 	var token = req.body.token;
-	//console.log(token);
 	var decoded = jwt.decode(token, {complete: true});
-	//console.log(decoded);
-	//console.log(decoded.payload);
 	var payload = decoded.payload;
 	var payload = JSON.stringify({payload});
 	res.status(200).send(payload);
-
-	//res.send(decoded);
 });
 
 
