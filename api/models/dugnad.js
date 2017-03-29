@@ -41,10 +41,10 @@ Dugnad.db_blueprint = function(){
   this.title = new DbField(),
   this.location = new DbField(),
   this.status = new DbField(),
-  this.start_time = new DbField(),
-  this.end_time = new DbField(),
+  this.startTime = new DbField(),
+  this.endTime = new DbField(),
   this.description = new DbField(),
-  this.max_partisipants = new DbField()
+  this.maxPartisipants = new DbField()
 }
 
 module.exports = Dugnad;

@@ -6,7 +6,7 @@ var Member = require('../../models/relationships/member');
 var Dugnad = require('../../models/dugnad');
 
 // TODO Add PUT
-// TODO Add DELETE
+// TODO Add DELETE? delete nothing, agregate everything 
 
 
 var routes = express.Router();
@@ -37,10 +37,10 @@ routes.get('/:uuid', (req, res) => {
       "dugnad": {
 *       "title": "my_dugnads_name",
 *       "status": "status_of_dugnad", // pre-planning, planning, ongoing, finished
-*       "start_time": "when_my_event_will_start",
-*       "end_time": "when_my_event_will_end",
+*       "startTime": "when_my_event_will_start",
+*       "endTime": "when_my_event_will_end",
 *       "description": "what_is_my_event_all_about",
-*       "max_partisipants": "max_number_of_possitions" // 0 for infinite
+*       "maxPartisipants": "max_number_of_possitions" // 0 for infinite
 *     },
 *     "user": {"email": "email@domail.tld"},
 *     "org":  {"uuid": "someuuid"}
@@ -51,7 +51,7 @@ routes.post('/', (req, res) => {
   dugnad.create()
   .then((result) => {
     query = "MATCH " + dugnad.make_query_object('a') +
-    ", " + org.make_query_object('b') + 
+    ", " + org.make_query_object('b') +
     "CREATE " + "(b)-[:Owns]->(a) RETURN a, b";
     Dugnad.custom_query(query).then(ret => {
       if (ret.records.length == 1){
