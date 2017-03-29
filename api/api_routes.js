@@ -45,9 +45,12 @@ routes.use((req, res, next) => {
         }
         console.log('valid token :D');
         req.auth_token = decoded;
+        next();
       })
+    } else {
+      next();
+      //res.status(401).send({message: "Invalid auth token. Please log in again"});
     }
-    next();
 })
 // token locked apis
 routes.use('/user', user);

@@ -115,11 +115,26 @@ function formatMemberReturn(result){
 *     "description": "a_discription_of_my_organizations"
 */
 routes.post('/', (req, res) => {
+  console.log(req.auth_token);
   var org = new Organization(req.body);
+  var creator = new User({email: req.auth_token.email});
   org.create()
-  .then((result) => {
-    res.status(200).send({msg: "Organization created"});
-  })
+  .then((result => {
+    let memb = new Member();
+    memb.db_fields.is_admin.data = true;
+    query = "MATCH " + creator.make_query_object('a') +
+      ", " + org.make_query_object('b') + "CREATE (a)-" +
+      memb.make_query_object('r', {use_all: true }) + "->(b)"
+    User.custom_query(query)
+    .then(result => {
+      res.status(200).send({msg: "Organization created"});
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400).send({message: "org was created, but could not set creator as admin"});
+    });
+  }))
+
   .catch((err) => {
     res.status(400).send(err);
     console.log(err);
@@ -237,12 +252,12 @@ routes.post('/apply', (req, res) => {
   User.custom_query(query)
   .then((result) => {
     if (result.records.length == 0){
-      res.status(400).send('User and Organization does not exist, ' +
-        'or user is already a member or has an active application');
+      res.status(400).send({message: 'User and Organization does not exist, ' +
+        'or user is already a member or has an active application'});
     } else if (result.records[0].length == 3){
-      res.status(200).send("Application sent");
+      res.status(200).send({message:"Application sent"});
     } else {
-      res.status(400).send("Something is wrong, this should not happen!");
+      res.status(400).send({message:"Something is wrong, this should not happen!"});
     }
   })
   .catch((err) => {

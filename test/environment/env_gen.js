@@ -11,6 +11,8 @@ function Environment(){
   this.users = [];
   this.organizations = [];
   this.applications = [];
+  this.memberships = [];
+  this.admins = [];
 
 
   // getters
@@ -69,6 +71,12 @@ function Environment(){
     return ret;
   }
 
+  this.pop_random_member = function(){
+    let rand = Math.floor(Math.random() * this.memberships.length);
+    //console.log(rand + this.organizations[rand].get_db_fields().name);
+    return this.memberships.splice(rand,1)[0];
+  }
+
 
 }
 
@@ -86,9 +94,15 @@ function populateEnvironment(){
       // then add applicants
       addMembershipApplications(env)
       .then(ret => {
-        acceptMembershipAllpications(env)
+        acceptMembershipApplications(env)
         .then(ret => {
-          res(env);
+          makeMemberAdmin(env)
+          .then(ret => {
+            res(env)
+          })
+          .catch(err => {
+            rej(err);
+          })
         })
         .catch(err => {
           rej(err);
@@ -147,7 +161,7 @@ function addValidOrganizations(env){
 function addMembershipApplications(env){
   return new Promise((res, rej) => {
     var promise_pool = [];
-    for (var i=0;i<6;i++){
+    for (var i=0;i<12;i++){
       let pair = env.get_random_unused_application_pair();
       env.applications.push(pair);
       //console.log(pair.user.get_db_fields().firstName + ' : ' +
@@ -169,11 +183,12 @@ function addMembershipApplications(env){
   })
 }
 
-function acceptMembershipAllpications(env){
+function acceptMembershipApplications(env){
   return new Promise((res, rej) => {
     let promise_pool = [];
-    for (let i=0;i<3;i++){
+    for (let i=0;i<6;i++){
       let application = env.get_random_application_and_remove();
+      env.memberships.push(application);
       let query_set = "MATCH " + application.user.make_query_object('a') + "-" +
         "[r:Applied {status: 'true'}]->" + application.org.make_query_object('b') +
         "SET r.status = 'false' ";
@@ -191,6 +206,28 @@ function acceptMembershipAllpications(env){
     })
   })
 }
+
+
+function makeMemberAdmin(env){
+  return new Promise((res, rej) => {
+    let promise_pool = [];
+    for (let i=0;i<3;i++){
+      let ms = env.pop_random_member();
+      env.admins.push(ms);
+      query = "MATCH " + ms.user.make_query_object('a')+
+        "-[r:Member]->" + ms.org.make_query_object('b') +
+        "SET r.is_admin = 'true'";
+      promise_pool.push(User.custom_query(query))
+    }
+    Promise.all(promise_pool).then(result => {
+      res();
+    }).catch(err => {
+      console.log(err);
+      rej(err);
+    })
+  })
+}
+
 
 // will run from console given argument 'make'
 for (let i=0;i<process.argv.length;i++){
