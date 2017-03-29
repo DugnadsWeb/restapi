@@ -11,6 +11,7 @@ var Dugnad = function(args){
   this.db_fields = {
     uuid: new DbField(null, ['unique']),
     title: new DbField(),
+    location: new DbField(),
     status: new DbField(),
     start_time: new DbField(),
     end_time: new DbField(),
