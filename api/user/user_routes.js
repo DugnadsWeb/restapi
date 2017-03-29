@@ -48,8 +48,14 @@ routes.get('/applications/:email', (req, res) => {
 });
 
 //GET users profilepicture
-routes.get('/:picture', (req, res) => {
-	let user = new User(req.params);
+routes.get('/picture', (req, res) => {
+	User.get_unique(req.params.email)
+  .then((user) => {
+    res.status(200).send(user);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
 });
 
 function formatActiveApplications(dbRet){
@@ -91,7 +97,7 @@ routes.post('/', (req, res) => {
 routes.post('/picture', (req,res) => {
   var user = new User(req.body.user);
   query = "MATCH " + user.make_query_object('a') +
-    "-[:Has]->(b:ProfileImage{base64:" + reg.body.base64 + "}) " +
+    "CREATE (a)-[:Has]->(b:ProfileImage{base64:'" + req.body.base64 + "'}) " +
     "RETURN b";
   User.custom_query(query)
   .then((ret) => {
