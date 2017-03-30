@@ -31,7 +31,8 @@ var db_base = function(){
   this.create = function(){
     return new Promise((res, rej) => {
       if (this.validate(this.db_fields)){
-        var query = "CREATE " + this.make_query_object('a', {use_all: true});
+        var query = "CREATE " + this.make_query_object('a', {use_all: true}) + 
+          " RETURN a";
         var session = driver.session();
         session.run(query)
           .then((result) => {

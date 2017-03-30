@@ -59,6 +59,7 @@ routes.get('/applicants/:uuid', (req, res) => {
   });
 });
 
+
 // formats output
 function formatApplicationsReturn(result){
   ret = []
@@ -86,6 +87,7 @@ routes.get('/members/:uuid', (req, res) => {
   })
 });
 
+
 function formatMemberReturn(result){
   let ret = {admins:[], members:[]};
   for (let i=0;i<result.records.length;i++){
@@ -97,6 +99,49 @@ function formatMemberReturn(result){
     }else{
       ret.members.push(member);
     }
+  }
+  return ret;
+}
+
+
+// Returns list of active applicants
+routes.get('/applicants/:uuid', (req, res) => {
+  let org = new Organization(req.params);
+  application = new Applied({status: true});
+  query = "MATCH " + org.make_query_object('a') +
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r \
+    ORDER BY r.applied_date ASC";
+  Organization.custom_query(query)
+  .then((result) => {
+      res.status(200).send(formatApplicationsReturn(result));
+  })
+  .catch((err) => {
+    console.log(err);
+    res.status(400).send(err);
+  });
+});
+
+
+// Returns list of active applicants
+routes.get('/dugnads/:uuid', (req, res) => {
+  let org = new Organization(req.params);
+  query = "MATCH " + org.make_query_object('a') +
+    "-[r:Owns]->(b:Dugnad) RETURN b \
+    ORDER BY r.applied_date ASC";
+  Organization.custom_query(query)
+  .then((result) => {
+      res.status(200).send(formatDugnadsReturn(result));
+  })
+  .catch((err) => {
+    console.log(err);
+    res.status(400).send(err);
+  });
+});
+
+function formatDugnadsReturn(dbRet){
+  let ret = []
+  for (let i=0;i<dbRet.records.length;i++){
+    ret.push(dbRet.records[i]._fields[0].properties);
   }
   return ret;
 }

@@ -23,7 +23,7 @@ var Dugnad = function(args){
 
   function _init(me, args) {
     var fields = me.db_fields;
-    if (!('uuid' in args) || !args['uuid']){
+    if (!('uuid' in args)){
       fields['uuid'].data = uuid();
     }
     for (arg in args){

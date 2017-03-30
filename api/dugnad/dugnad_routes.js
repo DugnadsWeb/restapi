@@ -52,10 +52,13 @@ routes.post('/', (req, res) => {
   let org = new Organization(req.body.org);
   dugnad.create()
   .then((result) => {
+
+    dugnad = new Dugnad(result.records[0]._fields[0].properties);
     query = "MATCH " + dugnad.make_query_object('a') +
     ", " + org.make_query_object('b') +
     "CREATE " + "(b)-[:Owns]->(a) RETURN a, b";
     Dugnad.custom_query(query).then(ret => {
+      console.log(ret);
       if (ret.records.length == 1){
         res.status(200).send({message: "Dugnad created"});
       } else {
@@ -63,6 +66,7 @@ routes.post('/', (req, res) => {
       }
     })
     .catch(err => {
+      console.log('i am thorp');
       res.status(400).send(err);
     })
   })
