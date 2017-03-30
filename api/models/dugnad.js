@@ -14,8 +14,8 @@ var Dugnad = function(args){
 
   this.validate = function(db_fields){
     if (db_fields.title.data.length > 5 ||
-      db_fields.start_time.data < db_fields.end_time.data ||
-      db_fields.max_partisipants.data > 0){
+      db_fields.startTime.data < db_fields.endTime.data ||
+      db_fields.maxPartisipants.data > 0){
         return true;
     }
     return false;
