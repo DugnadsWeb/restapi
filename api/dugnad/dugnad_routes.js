@@ -46,6 +46,8 @@ routes.get('/:uuid', (req, res) => {
 *     "org":  {"uuid": "someuuid"}
 */
 routes.post('/', (req, res) => {
+  console.log(req.body.dugnad);
+  console.log(req.body.org);
   let dugnad = new Dugnad(req.body.dugnad);
   let org = new Organization(req.body.org);
   dugnad.create()
@@ -65,6 +67,8 @@ routes.post('/', (req, res) => {
     })
   })
   .catch((err) => {
+    console.log('im callled dave the snake');
+    console.log(err);
     res.status(400).send(err);
   })
 });
