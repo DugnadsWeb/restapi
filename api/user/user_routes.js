@@ -48,8 +48,12 @@ routes.get('/applications/:email', (req, res) => {
 });
 
 //GET users profilepicture
-routes.get('/picture', (req, res) => {
-	User.get_unique(req.params.email)
+routes.get('/picture/:email', (req, res) => {
+	let user = new User(req.params);
+	query = "MATCH " + user.make_query_object('a') +
+	"-[:Has]->(b:ProfileImage) " +
+	"RETURN b";
+	User.custom_query(query)
   .then((user) => {
     res.status(200).send(user);
   })
