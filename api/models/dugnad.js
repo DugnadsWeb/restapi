@@ -38,6 +38,7 @@ Object.assign(Dugnad, Db_base);
 
 Dugnad.db_blueprint = function(){
   this.uuid = new DbField(null, ['unique']),
+  this.orgUuid = new DbField(),
   this.title = new DbField(),
   this.location = new DbField(),
   this.status = new DbField(),

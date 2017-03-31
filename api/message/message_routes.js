@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/user');
 const Organization = require('../models/organization');
 const Message = require('../models/message');
+const Dugnad = require('../models/dugnad');
 
 
 var routes = express.Router();
@@ -117,6 +118,8 @@ function lableToType(lable){
       return 'user';
     case 'Organization':
       return 'org';
+    case 'Dugnad':
+      return 'dugnad';
   }
 }
 
