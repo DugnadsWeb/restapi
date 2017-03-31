@@ -52,7 +52,7 @@ routes.get('/picture/:email', (req, res) => {
 	let user = new User(req.params);
 	query = "MATCH " + user.make_query_object('a') +
 	"-[:Has]->(b:ProfileImage) " +
-	"RETURN b";
+	"RETURN b ORDER BY b.timestamp DESC LIMIT 1";
 	User.custom_query(query)
   .then((user) => {
     res.status(200).send(user);
@@ -101,7 +101,7 @@ routes.post('/', (req, res) => {
 routes.post('/picture', (req,res) => {
   var user = new User(req.body.user);
   query = "MATCH " + user.make_query_object('a') +
-    "CREATE (a)-[:Has]->(b:ProfileImage{base64:'" + req.body.base64 + "'}) " +
+    "CREATE (a)-[:Has]->(b:ProfileImage{timestamp: TIMESTAMP(), base64:'" + req.body.base64 + "'}) " +
     "RETURN b";
   User.custom_query(query)
   .then((ret) => {
