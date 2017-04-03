@@ -31,7 +31,8 @@ var db_base = function(){
   this.create = function(){
     return new Promise((res, rej) => {
       if (this.validate(this.db_fields)){
-        var query = "CREATE " + this.make_query_object('a', {use_all: true});
+        var query = "CREATE " + this.make_query_object('a', {use_all: true}) + 
+          " RETURN a";
         var session = driver.session();
         session.run(query)
           .then((result) => {
@@ -77,6 +78,7 @@ var db_base = function(){
       var query = "MATCH " + this.make_query_object('a') +
         build_update_query(edited_object);
       var session = driver.session();
+      console.log(query);
       session.run(query)
         .then(() => {
           session.close();

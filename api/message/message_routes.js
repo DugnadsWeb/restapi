@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/user');
 const Organization = require('../models/organization');
 const Message = require('../models/message');
+const Dugnad = require('../models/dugnad');
 
 
 var routes = express.Router();
@@ -88,11 +89,7 @@ routes.get('/:receiverType/:receiverId', (req, res) => {
     "<-[:Received]-(b:Message)<-[:Sent]-(c) RETURN b, c \
     ORDER BY b.sent_time DESC";
   Message.custom_query(query).then(result => {
-    if (result.records.length == 0){
-      res.status(404).send({message:"No Messages found"});
-    } else {
-      res.status(200).send(makeReceiverReturnObject(result));
-    }
+    res.status(200).send(makeReceiverReturnObject(result));
   })
   .catch(err => {
     console.log(err);
@@ -121,6 +118,8 @@ function lableToType(lable){
       return 'user';
     case 'Organization':
       return 'org';
+    case 'Dugnad':
+      return 'dugnad';
   }
 }
 

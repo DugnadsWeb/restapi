@@ -47,6 +47,29 @@ routes.get('/applications/:email', (req, res) => {
   });
 });
 
+//GET users profilepicture
+routes.get('/picture/:email', (req, res) => {
+	let user = new User(req.params);
+	query = "MATCH " + user.make_query_object('a') +
+	"-[:Has]->(b:ProfileImage) " +
+	"RETURN b ORDER BY b.timestamp DESC LIMIT 1";
+	User.custom_query(query)
+  .then((user) => {
+    res.status(200).send(formatProfilePic(user));
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
+
+function formatProfilePic(dbUser){
+  let ret = [];
+	
+	ret.push(dbUser.records[0]._fields[0].properties.base64);	
+	
+	return ret;
+}
+
 function formatActiveApplications(dbRet){
   console.log(dbRet.records[0]);
   let ret = [];
@@ -64,8 +87,8 @@ function formatActiveApplications(dbRet){
 
 /* Create user
 *   Request body: {
-*     "first_name": "my_first_name",
-*     "last_name": "my_last_name",
+*     "firstName": "my_firstName",
+*     "lastName": "my_lastName",
 *     "email": "my_email@domain.tld",
 *     "password": "my_super_safe_pw"
 *   }
@@ -81,19 +104,29 @@ routes.post('/', (req, res) => {
   })
 });
 
+//Upload profile picture for user
+
+routes.post('/picture', (req,res) => {
+  var user = new User(req.body.user);
+  query = "MATCH " + user.make_query_object('a') +
+    "CREATE (a)-[:Has]->(b:ProfileImage{timestamp: TIMESTAMP(), base64:'" + req.body.base64 + "'}) " +
+    "RETURN b";
+  User.custom_query(query)
+  .then((ret) => {
+  	 res.status(200).send(ret);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
 
 // TODO trenger vi egentlig denne, kan egentlig sende med brukerinfo under innlogging
 routes.post('/me', (req,res) => {
 	var token = req.body.token;
-	//console.log(token);
 	var decoded = jwt.decode(token, {complete: true});
-	//console.log(decoded);
-	//console.log(decoded.payload);
 	var payload = decoded.payload;
 	var payload = JSON.stringify({payload});
 	res.status(200).send(payload);
-
-	//res.send(decoded);
 });
 
 

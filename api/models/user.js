@@ -21,8 +21,8 @@ var User = function(arg){
   // User creation validation
   // TODO add regex checks
   this.validate = function(db_fields){
-    if(db_fields.first_name.data.length > 2 &&
-      db_fields.last_name.data.length > 2 &&
+    if(db_fields.firstName.data.length > 2 &&
+      db_fields.lastName.data.length > 2 &&
       db_fields.password.data.length > 5 &&
       db_fields.email.data.length > 5){
         return true;
@@ -59,8 +59,8 @@ var User = function(arg){
 }
 
 User.db_blueprint = function (){
-  this.first_name = new DbField();
-  this.last_name = new DbField();
+  this.firstName = new DbField();
+  this.lastName = new DbField();
   this.email = new DbField(null, ['unique']);
   this.password = new DbField();
 }

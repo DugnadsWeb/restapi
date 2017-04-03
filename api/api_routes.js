@@ -9,6 +9,7 @@ var user = require('./user/user_routes');
 var auth = require('./auth/auth_routes');
 var organization = require('./org/organization_routes');
 var message = require('./message/message_routes');
+var dugnad = require('./dugnad/dugnad_routes');
 
 
 routes.all("/*", function(req, res, next){
@@ -40,18 +41,22 @@ routes.use((req, res, next) => {
       let token = req.headers.authorization.substring(7);
       jwt.verify(token, config.secret, (err, decoded) => {
         if (err) {
-          res.send(401).send({message: "Token is invalid, log in and out"});
+          res.status(401).send({message: "Token is invalid, log in and out"});
           return;
         }
         console.log('valid token :D');
         req.auth_token = decoded;
+        next();
       })
+    } else {
+      next();
+      //res.status(401).send({message: "Invalid auth token. Please log in again"});
     }
-    next();
 })
 // token locked apis
 routes.use('/user', user);
 routes.use('/org', organization);
 routes.use('/msg', message);
+routes.use('/dugnad', dugnad);
 
 module.exports = routes;

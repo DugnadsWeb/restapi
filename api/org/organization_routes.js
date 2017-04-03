@@ -3,7 +3,7 @@ var User = require('../models/user');
 var Organization = require('../models/organization');
 var Applied = require('../models/relationships/applied');
 var Member = require('../models/relationships/member');
-var dugnad_routes = require('./dugnad/dugnad_routes');
+
 
 
 // TODO add PUT
@@ -13,7 +13,7 @@ var routes = express.Router();
 
 
 
-routes.use('/dugnad', dugnad_routes);
+
 
 // ######
 // GET ##
@@ -34,33 +34,31 @@ routes.get('/:uuid', (req, res) => {
     res.status(200).send(result);
   })
   .catch((err) => {
-    console.log(err);
-    res.status(400).send(err);
+    if (err == "No results found"){
+      res.status(404).send(err);
+    } else {
+      res.status(400).send(err);
+    }
   });
 });
 
 // Returns list of active applicants
-routes.get('/:uuid/applicants', (req, res) => {
+routes.get('/applicants/:uuid', (req, res) => {
   let org = new Organization(req.params);
   application = new Applied({status: true});
   query = "MATCH " + org.make_query_object('a') +
-    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r";
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r \
+    ORDER BY r.applied_date ASC";
   Organization.custom_query(query)
   .then((result) => {
-    if (result.records.length == 0){
-      res.status(400).send({message: "Either the org does not exist or there are no applications"})
-    } else if (result.records[0].length == 3) {
-      console.log(result.records);
       res.status(200).send(formatApplicationsReturn(result));
-    } else {
-      res.status(400).send({message: "Horrible error!"});
-    }
   })
   .catch((err) => {
     console.log(err);
     res.status(400).send(err);
   });
 });
+
 
 // formats output
 function formatApplicationsReturn(result){
@@ -82,16 +80,13 @@ routes.get('/members/:uuid', (req, res) => {
   query = "MATCH " + org.make_query_object('a') + "<-[r:Member]-(b:User) " +
   "RETURN r, b";
   Organization.custom_query(query).then(result => {
-    if (result.records.length == 0){
-      res.status(404).send({message:"No members found"});
-    } else {
-      res.status(200).send(formatMemberReturn(result));
-    }
+    res.status(200).send(formatMemberReturn(result));
   })
   .catch(err => {
     res.status(400).send(err);
   })
 });
+
 
 function formatMemberReturn(result){
   let ret = {admins:[], members:[]};
@@ -109,24 +104,82 @@ function formatMemberReturn(result){
 }
 
 
+// Returns list of active applicants
+routes.get('/applicants/:uuid', (req, res) => {
+  let org = new Organization(req.params);
+  application = new Applied({status: true});
+  query = "MATCH " + org.make_query_object('a') +
+    "<-[r:Applied {status:'true'}]-(b:User) RETURN a, b, r \
+    ORDER BY r.applied_date ASC";
+  Organization.custom_query(query)
+  .then((result) => {
+      res.status(200).send(formatApplicationsReturn(result));
+  })
+  .catch((err) => {
+    console.log(err);
+    res.status(400).send(err);
+  });
+});
+
+
+// Returns list of active applicants
+routes.get('/dugnads/:uuid', (req, res) => {
+  let org = new Organization(req.params);
+  query = "MATCH " + org.make_query_object('a') +
+    "-[r:Owns]->(b:Dugnad) RETURN b \
+    ORDER BY r.applied_date ASC";
+  Organization.custom_query(query)
+  .then((result) => {
+      res.status(200).send(formatDugnadsReturn(result));
+  })
+  .catch((err) => {
+    console.log(err);
+    res.status(400).send(err);
+  });
+});
+
+function formatDugnadsReturn(dbRet){
+  let ret = []
+  for (let i=0;i<dbRet.records.length;i++){
+    ret.push(dbRet.records[i]._fields[0].properties);
+  }
+  return ret;
+}
+
+
 // #######
 // POST ##
 // #######
 
 /* Create user
 *   Request body: {
-*     "org_number": "my_nine_digit_org_number",
+*     "orgNumber": "my_nine_digit_orgNumber",
 *     "name": "my_orgs_name",
 *     "email": "my_orgs_email@domain.tld",
 *     "phone": "my_orgs_phone_number",
 *     "description": "a_discription_of_my_organizations"
 */
 routes.post('/', (req, res) => {
+  console.log(req.auth_token);
   var org = new Organization(req.body);
+  var creator = new User({email: req.auth_token.email});
   org.create()
-  .then((result) => {
-    res.status(200).send({msg: "Organization created"});
-  })
+  .then((result => {
+    let memb = new Member();
+    memb.db_fields.is_admin.data = true;
+    query = "MATCH " + creator.make_query_object('a') +
+      ", " + org.make_query_object('b') + "CREATE (a)-" +
+      memb.make_query_object('r', {use_all: true }) + "->(b)"
+    User.custom_query(query)
+    .then(result => {
+      res.status(200).send({msg: "Organization created"});
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400).send({message: "org was created, but could not set creator as admin"});
+    });
+  }))
+
   .catch((err) => {
     res.status(400).send(err);
     console.log(err);
@@ -185,7 +238,7 @@ routes.post('/chadmin', (req, res) => {
   console.log(query);
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send("Admin rights " + (req.body.admin? "granted" : "revoked"));
+    res.status(200).send({message:"Admin rights " + (req.body.admin? "granted" : "revoked")});
   })
   .catch((err) => {
     res.status(400).send(err);
@@ -208,7 +261,7 @@ routes.post('/rmmember', (req, res) => {
   console.log(query);
   Organization.custom_query(query)
   .then((result) => {
-    res.status(200).send("Memeber removed");
+    res.status(200).send({message: "Memeber removed"});
   })
   .catch((err) => {
     res.status(400).send(err);
@@ -244,17 +297,47 @@ routes.post('/apply', (req, res) => {
   User.custom_query(query)
   .then((result) => {
     if (result.records.length == 0){
-      res.status(400).send('User and Organization does not exist, ' +
-        'or user is already a member or has an active application');
+      res.status(400).send({message: 'User and Organization does not exist, ' +
+        'or user is already a member or has an active application'});
     } else if (result.records[0].length == 3){
-      res.status(200).send("Application sent");
+      res.status(200).send({message:"Application sent"});
     } else {
-      res.status(400).send("Something is wrong, this should not happen!");
+      res.status(400).send({message:"Something is wrong, this should not happen!"});
     }
   })
   .catch((err) => {
     res.status(400).send(err);
   });
+});
+
+
+// #######
+// PUT ###
+// #######
+
+// PUT
+/*
+* Edit user info
+*   Request body {
+*     "org": { user fileds to change }
+*   }
+*/
+routes.put('/', (req, res) => {
+
+  if (!req.body.org) {
+    res.status(400).send({message:"request body is incomplete"});
+    return;
+  }
+  var org = new Organization(req.body.org);
+  console.log(org);
+  // reson for taking itself as an argument: it is intentded for objects that can mutate its own unique id
+  org.update(org)
+  .then((result) => {
+    res.status(200).send({message: "Organization updated"});
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
 });
 
 

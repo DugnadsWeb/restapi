@@ -1,31 +1,31 @@
 [
   {
-    "first_name": "Janne",
-    "last_name": "Jensen",
+    "firstName": "Janne",
+    "lastName": "Jensen",
     "email": "janne@dugnad.no",
-    "password": "oliolioli56@"
+    "password": "passord"
   },
   {
-    "first_name": "Per",
-    "last_name": "Persen",
+    "firstName": "Per",
+    "lastName": "Persen",
     "email": "prepre@dugnad.no",
-    "password": "sgwegwerg345"
+    "password": "passord"
   },
   {
-    "first_name": "Jim JJ",
-    "last_name": "Jimsen",
+    "firstName": "Jim JJ",
+    "lastName": "Jimsen",
     "email": "JimmyJ@dugnad.no",
-    "password": "sdbsd52345g"
+    "password": "passord"
   },
   {
-    "first_name": "Stian",
-    "last_name": "Krullerud",
+    "firstName": "Stian",
+    "lastName": "Krullerud",
     "email": "skrulle@msn.com",
     "password": "passord"
   },
   {
-    "first_name": "Tina",
-    "last_name": "Østad",
+    "firstName": "Tina",
+    "lastName": "Østad",
     "email": "tøsta@yahoo.no",
     "password": "passord"
   }

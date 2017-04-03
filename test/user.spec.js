@@ -33,8 +33,8 @@ var user_tests  = {
     should:'Should return status 200',
     test: function() {
       var test_user = {
-        first_name: "Britt Arne",
-        last_name: "Bergrud",
+        firstName: "Britt Arne",
+        lastName: "Bergrud",
         email: "britta@undergang.no",
         password: "morrobritt"
       };
@@ -69,8 +69,8 @@ user_tests.put_valid = function() {
   function test() {
     env = new Environment();
     user = env.get_random_user();
-    user.db_fields.first_name.data = "yoloswag";
-    user.db_fields.last_name.data = "G-bsen";
+    user.db_fields.firstName.data = "yoloswag";
+    user.db_fields.lastName.data = "G-bsen";
     user.db_fields.password.data = "imanewpassword";
     return chai.request('http://localhost:8888')
     .put('/api/user')
@@ -121,8 +121,8 @@ user_tests.post_valid = () => {
   this.should = 'Should return status 200';
 
   var test_user = {
-    first_name: "Britt Arne",
-    last_name: "Bergrud",
+    firstName: "Britt Arne",
+    lastName: "Bergrud",
     email: "britta@undergang.no",
     password: "morrobritt"
   };

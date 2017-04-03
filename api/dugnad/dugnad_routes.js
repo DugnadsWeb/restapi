@@ -1,12 +1,12 @@
 var express = require('express');
-var User = require('../../models/user');
-var Organization = require('../../models/organization');
-var Applied = require('../../models/relationships/applied');
-var Member = require('../../models/relationships/member');
-var Dugnad = require('../../models/dugnad');
+var User = require('../models/user');
+var Organization = require('../models/organization');
+var Applied = require('../models/relationships/applied');
+var Member = require('../models/relationships/member');
+var Dugnad = require('../models/dugnad');
 
 // TODO Add PUT
-// TODO Add DELETE
+// TODO Add DELETE? delete nothing, agregate everything
 
 
 var routes = express.Router();
@@ -37,21 +37,42 @@ routes.get('/:uuid', (req, res) => {
       "dugnad": {
 *       "title": "my_dugnads_name",
 *       "status": "status_of_dugnad", // pre-planning, planning, ongoing, finished
-*       "start_time": "when_my_event_will_start",
-*       "end_time": "when_my_event_will_end",
+*       "startTime": "when_my_event_will_start",
+*       "endTime": "when_my_event_will_end",
 *       "description": "what_is_my_event_all_about",
-*       "max_partisipants": "max_number_of_possitions" // 0 for infinite
+*       "maxPartisipants": "max_number_of_possitions" // 0 for infinite
 *     },
 *     "user": {"email": "email@domail.tld"},
 *     "org":  {"uuid": "someuuid"}
 */
 routes.post('/', (req, res) => {
-  dugnad = new Dugnad(req.body);
+  console.log(req.body.dugnad);
+  console.log(req.body.org);
+  let dugnad = new Dugnad(req.body.dugnad);
+  let org = new Organization(req.body.org);
   dugnad.create()
   .then((result) => {
-    res.status(200).send("Object created");
+
+    dugnad = new Dugnad(result.records[0]._fields[0].properties);
+    query = "MATCH " + dugnad.make_query_object('a') +
+    ", " + org.make_query_object('b') +
+    "CREATE " + "(b)-[:Owns]->(a) RETURN a, b";
+    Dugnad.custom_query(query).then(ret => {
+      console.log(ret);
+      if (ret.records.length == 1){
+        res.status(200).send({message: "Dugnad created"});
+      } else {
+        res.status(400).send({message: "Something is wrong!"});
+      }
+    })
+    .catch(err => {
+      console.log('i am thorp');
+      res.status(400).send(err);
+    })
   })
   .catch((err) => {
+    console.log('im callled dave the snake');
+    console.log(err);
     res.status(400).send(err);
   })
 });
