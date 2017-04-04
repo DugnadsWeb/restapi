@@ -55,12 +55,43 @@ routes.get('/picture/:email', (req, res) => {
 	"RETURN b ORDER BY b.timestamp DESC LIMIT 1";
 	User.custom_query(query)
   .then((user) => {
-    res.status(200).send(user);
+    res.status(200).send(formatProfilePic(user));
   })
   .catch((err) => {
     res.status(400).send(err);
   });
 });
+
+routes.get('/organizations/:email', (req, res) =>{
+  let user = new User(req.params);
+  query = "MATCH " + user.make_query_object('a') +
+  "-[:Member]->(b:Organization) " +
+  "RETURN b";
+  User.custom_query(query)
+      .then(ret => {
+          res.status(200).send(formatOrganizations(ret));
+      })
+      .catch((err) => {
+      res.status(400).send(err);
+      });
+});
+
+function formatOrganizations(dbOrg){
+    let ret = [];
+    for(let i=0;i<dbOrg.records.length;i++){
+        ret.push(dbOrg.records[i]._fields[0].properties.orgName);
+        ret.push(dbOrg.records[i]._fields[0].properties.uuid);
+    }
+    return ret;
+}
+
+function formatProfilePic(dbUser){
+  let ret = [];
+	
+	ret.push(dbUser.records[0]._fields[0].properties.base64);	
+	
+	return ret;
+}
 
 function formatActiveApplications(dbRet){
   console.log(dbRet.records[0]);

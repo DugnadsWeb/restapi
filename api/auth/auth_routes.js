@@ -70,7 +70,7 @@ function buildReturnObject(actual_user){
           token: token
         });
       })
-    } else {
+    } else{
       res.status(400).send({
         success: false,
         message: 'authentication failed'

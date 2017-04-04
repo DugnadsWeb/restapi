@@ -20,7 +20,8 @@ var Organization = function(args){
       db_fields.email.data.length > 5 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(db_fields.email.data) &&
       db_fields.phone.data.length >= 8 &&
-      /^\d+$/.test(db_fields.phone.data)){
+      /^\d+$/.test(db_fields.phone.data)
+      ){
         return true;
       }
       return false;
