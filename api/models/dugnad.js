@@ -38,14 +38,14 @@ Object.assign(Dugnad, Db_base);
 
 Dugnad.db_blueprint = function(){
   this.uuid = new DbField(null, ['unique']),
-  this.orgUuid = new DbField(),
-  this.title = new DbField(),
-  this.location = new DbField(),
-  this.status = new DbField(),
-  this.startTime = new DbField(),
-  this.endTime = new DbField(),
-  this.description = new DbField(),
-  this.maxPartisipants = new DbField()
+  this.orgUuid = new DbField(""),
+  this.title = new DbField(""),
+  this.location = new DbField(""),
+  this.status = new DbField("true"),
+  this.startTime = new DbField("0"),
+  this.endTime = new DbField("0"),
+  this.description = new DbField(""),
+  this.maxPartisipants = new DbField("0")
 }
 
 module.exports = Dugnad;

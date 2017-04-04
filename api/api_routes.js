@@ -10,7 +10,7 @@ var auth = require('./auth/auth_routes');
 var organization = require('./org/organization_routes');
 var message = require('./message/message_routes');
 var dugnad = require('./dugnad/dugnad_routes');
-
+var activity = require('./activity/activity_routes');
 
 routes.all("/*", function(req, res, next){
   res.header('Access-Control-Allow-Origin', '*');
@@ -58,5 +58,6 @@ routes.use('/user', user);
 routes.use('/org', organization);
 routes.use('/msg', message);
 routes.use('/dugnad', dugnad);
+routes.use('/activity', activity);
 
 module.exports = routes;

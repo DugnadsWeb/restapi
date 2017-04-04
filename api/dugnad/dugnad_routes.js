@@ -16,15 +16,38 @@ var routes = express.Router();
 // GET ##
 // ######
 
+// get dugnad by id
 routes.get('/:uuid', (req, res) => {
   Dugnad.get_unique(req.params.uuid)
   .then((result) => {
     res.status(200).send(result);
   })
   .catch((err) => {
-    res.send(400).send(err);
+    res.status(400).send(err);
   });
 });
+
+routes.get('/activities/:uuid', (req, res) => {
+  let dugnad = new Dugnad(req.params);
+  let query = "MATCH " + dugnad.make_query_object('a') +
+    "-[:Has]->(b:Activity) RETURN b";
+  Dugnad.custom_query(query)
+  .then((result) => {
+    res.status(200).send(formatGetActivityReturn(result));
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
+
+function formatGetActivityReturn(dbReturn){
+  let ret = [];
+  for (let i=0;i<dbReturn.records.length;i++){
+    ret.push(dbReturn.records[i]._fields[0].properties);
+  }
+  return ret;
+}
+
 
 
 // #######
@@ -37,6 +60,7 @@ routes.get('/:uuid', (req, res) => {
       "dugnad": {
 *       "title": "my_dugnads_name",
 *       "status": "status_of_dugnad", // pre-planning, planning, ongoing, finished
+*       "location": "place",
 *       "startTime": "when_my_event_will_start",
 *       "endTime": "when_my_event_will_end",
 *       "description": "what_is_my_event_all_about",
