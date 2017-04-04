@@ -62,6 +62,29 @@ routes.get('/picture/:email', (req, res) => {
   });
 });
 
+routes.get('/organizations/:email', (req, res) =>{
+  let user = new User(req.params);
+  query = "MATCH " + user.make_query_object('a') +
+  "-[:Member]->(b:Organization) " +
+  "RETURN b";
+  User.custom_query(query)
+      .then(ret => {
+          res.status(200).send(formatOrganizations(ret));
+      })
+      .catch((err) => {
+      res.status(400).send(err);
+      });
+});
+
+function formatOrganizations(dbOrg){
+    let ret = [];
+    for(let i=0;i<dbOrg.records.length;i++){
+        ret.push(dbOrg.records[i]._fields[0].properties.orgName);
+        ret.push(dbOrg.records[i]._fields[0].properties.uuid);
+    }
+    return ret;
+}
+
 function formatProfilePic(dbUser){
   let ret = [];
 	

@@ -122,7 +122,7 @@ routes.get('/applicants/:uuid', (req, res) => {
 });
 
 
-// Returns list of active applicants
+// Returns list of dugnads for org
 routes.get('/dugnads/:uuid', (req, res) => {
   let org = new Organization(req.params);
   query = "MATCH " + org.make_query_object('a') +

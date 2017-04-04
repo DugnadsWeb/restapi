@@ -26,7 +26,29 @@ routes.get('/:uuid', (req, res) => {
   });
 });
 
+routes.get('/organization/:uuid', (req,res) => {
+  let org = new Organization(req.params);
+  query = "MATCH " + org.make_query_object('a') +
+  "-[:Owns]->(b:Dugnad) " +
+  "RETURN b";
+  Organization.custom_query(query)
+      .then(ret => {
+        res.status(200).send(formatDugnadReturn(ret));
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+});
 
+function formatDugnadReturn(dbDugnad){
+  let ret = [];
+
+  for(let i=0; i < dbDugnad.records.length; i++){
+    ret.push(dbDugnad.records[i]._fields[0].properties)
+  }
+
+  return ret;
+}
 // #######
 // POST ##
 // #######
