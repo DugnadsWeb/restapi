@@ -1,9 +1,37 @@
 const express = require('express');
 const Activity = require('../models/activity');
 const Dugnad = require('../models/dugnad');
+const User = require('../models/user');
 
 const routes = express.Router();
 
+
+
+// ######
+// GET ##
+// ######
+
+routes.get('/attendants/:uuid', (req, res) => {
+  let activity = new Activity(req.params);
+  let query = "MATCH " + activity.make_query_object('a') +
+    "<-[:Attends]-(b:User) RETURN b";
+  Activity.custom_query(query).then(ret => {
+    res.status(200).send(formatGetAttendants(ret));
+  }).catch(err => res.status(400).send(err));
+})
+
+function formatGetAttendants(dbRet){
+  let ret = [];
+  console.log(dbRet);
+  for (let i=0;i<dbRet.records.length;i++){
+    ret.push(dbRet.records[i]._fields[0].properties);
+  }
+  return ret;
+}
+
+// #######
+// POST ##
+// #######
 
 /* Create new activity
 *   request body {
@@ -44,7 +72,7 @@ routes.post('/', (req, res) =>{
   }).catch(err => res.status(400).send(err))
 })
 
-/* Allpy to activity
+/* Allpy/unapply to activity
 *   Request body {
 *     "activity" : { "uuid": "idstring" },  // the activity to apply to
 *     "user" : { "email": "email@domain.tld"},  // user to apply
@@ -52,7 +80,7 @@ routes.post('/', (req, res) =>{
 *   }
 */
 routes.post('/apply', (req, res) => {
-  if (!req.body.activity || !req.body.user || !req.body.action){
+  if (!req.body.activity || !req.body.user || !(typeof req.body.action == 'boolean')){
     res.status(400).send({message:"Malformed request"});
     return;
   }
@@ -68,19 +96,22 @@ routes.post('/apply', (req, res) => {
   function apply(activity, user, res){
     let query = "MATCH " + activity.make_query_object('a') + ", " +
       user.make_query_object('b') +
-      "CREATE OPTIONAL (b)-[r:Attends]->(a) " +
+      " CREATE UNIQUE (b)-[r:Attends]->(a) " +
       "RETURN r";
-
+    console.log(query);
     Activity.custom_query(query).then(ret => {
       if (ret.records.length == 0) {
-        res.status(400).send({message:"User all ready applied"});
+        res.status(400).send({message:"User already applied"});
       } else if (ret.records.length == 1) {
         res.status(200).send({message: "user applied"});
         // TODO add meta data aka token_user-[assigned {userId, timestamp}]->(activity)
       } else {
         res.status(400).send({message:"something is seriously wrong"});
       }
-    }).catch(err => res.status(400).send(err));
+    }).catch(err => {
+      console.log(err);
+      res.status(400).send(err)
+    });
   }
 
   function unapply(action, user, res){

@@ -101,11 +101,11 @@ routes.post('/', (req, res) => {
     dugnad = new Dugnad(result.records[0]._fields[0].properties);
     query = "MATCH " + dugnad.make_query_object('a') +
     ", " + org.make_query_object('b') +
-    "CREATE " + "(b)-[:Owns]->(a) RETURN a, b";
+    "CREATE " + "(b)-[:Owns]->(a) RETURN a";
     Dugnad.custom_query(query).then(ret => {
       console.log(ret);
       if (ret.records.length == 1){
-        res.status(200).send({message: "Dugnad created"});
+        res.status(200).send(ret.records[0]._fields[0].properties);
       } else {
         res.status(400).send({message: "Something is wrong!"});
       }
