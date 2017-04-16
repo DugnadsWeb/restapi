@@ -11,6 +11,17 @@ const routes = express.Router();
 // GET ##
 // ######
 
+
+routes.get('/:uuid', (req, res) => {
+  Activity.get_unique(req.params.uuid)
+  .then(activity => {
+    res.status(200).send(activity);
+  })
+  .catch(err => {
+    res.status(400).send(err);
+  })
+})
+
 routes.get('/attendants/:uuid', (req, res) => {
   let activity = new Activity(req.params);
   let query = "MATCH " + activity.make_query_object('a') +
@@ -133,6 +144,33 @@ routes.post('/apply', (req, res) => {
 
 })
 
+// #######
+// PUT ###
+// #######
+
+// PUT
+/*
+* Edit user info
+*   Request body {
+*     "activity": { uuid and activity fileds to change }
+*   }
+*/
+routes.put('/', (req, res) => {
+  if (!req.body.activity) {
+    res.status(400).send({message:"request body is incomplete"});
+    return;
+  }
+  console.log(req.body.activity);
+  var activity = new Activity(req.body.activity);
+  // reson for taking itself as an argument: it is intentded for objects that can mutate its own unique id
+  activity.update(activity)
+  .then((result) => {
+    res.status(200).send({message: "Organization updated"});
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
+});
 
 
 

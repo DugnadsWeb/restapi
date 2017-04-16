@@ -25,6 +25,7 @@ var Activity = function(args){
       fields['uuid'].data = uuid();
     }
     for (arg in args){
+      console.log(arg);
       if (arg in me.db_fields){
         fields[arg].data = args[arg];
       }
