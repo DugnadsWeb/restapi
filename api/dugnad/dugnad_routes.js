@@ -151,5 +151,33 @@ routes.post('/apply', (req, res) => {
 });
 
 
+// #######
+// PUT ###
+// #######
+
+// PUT
+/*
+* Edit dugnad info
+*   Request body {
+*     "dugnad": { uuid and dugnad fileds to change }
+*   }
+*/
+routes.put('/', (req, res) => {
+  if (!req.body.dugnad) {
+    res.status(400).send({message:"request body is incomplete"});
+    return;
+  }
+  var dugnad = new Dugnad(req.body.dugnad);
+  // reson for taking itself as an argument: it is intentded for objects that can mutate its own unique id
+  dugnad.update(dugnad)
+  .then((result) => {
+    res.status(200).send({message: "Dugnad updated"});
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  })
+});
+
+
 
 module.exports = routes;

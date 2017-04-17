@@ -150,7 +150,7 @@ routes.post('/apply', (req, res) => {
 
 // PUT
 /*
-* Edit user info
+* Edit activity info
 *   Request body {
 *     "activity": { uuid and activity fileds to change }
 *   }
@@ -165,7 +165,7 @@ routes.put('/', (req, res) => {
   // reson for taking itself as an argument: it is intentded for objects that can mutate its own unique id
   activity.update(activity)
   .then((result) => {
-    res.status(200).send({message: "Organization updated"});
+    res.status(200).send({message: "Activity updated"});
   })
   .catch((err) => {
     res.status(400).send(err);
