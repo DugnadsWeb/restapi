@@ -147,6 +147,34 @@ function formatDugnadsReturn(dbRet){
 }
 
 
+routes.get('/stats/attendants/year/:uuid/:year', (req, res) => {
+  let org = new Organization({uuid:req.params.uuid});
+  let minMs = new Date(+req.params.year, 0).getTime();
+  let maxMs = new Date(+req.params.year+1, 0).getTime();
+  let query = "MATCH " + org.make_query_object('a') +
+    "-[:Owns]-(b:Dugnad)-[:Has]-(c:Activity)-[:Attends]-(d:User)" +
+    "WHERE toInt(b.startTime) > " + minMs + " AND toInt(b.startTime) < " + maxMs +
+    " RETURN d, count(d)";
+  Organization.custom_query(query)
+  .then( dbRet => {
+    res.status(200).send(formatStatsAttendantsReturn(dbRet));
+  }).catch(err => {
+    console.log(err);
+    res.status(400).send(err);
+  })
+})
+
+function formatStatsAttendantsReturn(dbReturn){
+  let ret = [];
+  for(let i=0;i<dbReturn.records.length;i++){
+    let user = dbReturn.records[i]._fields[0].properties;
+    delete user.password;
+    let count = dbReturn.records[i]._fields[1].low;
+    ret.push({user: user, count: count});
+  }
+  return ret;
+}
+
 // #######
 // POST ##
 // #######
