@@ -18,6 +18,7 @@ routes.get('/:uuid', (req, res) => {
     res.status(200).send(activity);
   })
   .catch(err => {
+    console.log(err);
     res.status(400).send(err);
   })
 })
@@ -36,6 +37,7 @@ function formatGetAttendants(dbRet){
   console.log(dbRet);
   for (let i=0;i<dbRet.records.length;i++){
     ret.push(dbRet.records[i]._fields[0].properties);
+    delete ret[ret.length-1].password;
   }
   return ret;
 }

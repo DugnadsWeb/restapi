@@ -31,7 +31,7 @@ var db_base = function(){
   this.create = function(){
     return new Promise((res, rej) => {
       if (this.validate(this.db_fields)){
-        var query = "CREATE " + this.make_query_object('a', {use_all: true}) + 
+        var query = "CREATE " + this.make_query_object('a', {use_all: true}) +
           " RETURN a";
         var session = driver.session();
         session.run(query)
@@ -228,7 +228,6 @@ db_base.get_unique = function(unique_id){
     session = driver.session();
     session.run(query)
     .then((result) => {
-      session.close();
       //console.log(result.records[0]._fields[0].properties);
       if (result.records.length == 0){
         rej("No results found");
@@ -237,8 +236,10 @@ db_base.get_unique = function(unique_id){
       } else {
         rej("Multiple results found; something is seriously wrong");
       }
+        session.close();
     })
     .catch((err) => {
+      console.log(err);
       session.close();
       rej(err);
     })
@@ -285,6 +286,7 @@ db_base.custom_query = function(query){
     })
     .catch((err) => {
       session.close();
+      console.log(err);
       rej(err);
     })
   })

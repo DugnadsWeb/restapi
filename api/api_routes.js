@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const routes = express.Router();
+var driver = require('../neo4j_db')();
 
 
 // api Routes
@@ -59,5 +60,10 @@ routes.use('/org', organization);
 routes.use('/msg', message);
 routes.use('/dugnad', dugnad);
 routes.use('/activity', activity);
+
+
+routes.use((req, res, next) => {
+  driver.close();
+});
 
 module.exports = routes;
