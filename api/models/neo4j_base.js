@@ -164,7 +164,7 @@ var db_base = function(){
   // options: use_all - uses all defined object fields
   this.make_query_object = function (tag, options){
       options = !!options ? options : {}
-      let query = "(" + (!!tag ? tag : '') + ":" + this.constructor.name + " { ";
+      let query = "(" + (!!tag ? tag : '') + ":" + this.type + " { ";
       for (var field in this.db_fields){
         if (this.db_fields[field].data !== undefined && this.db_fields[field].data !== null){
           if (this.db_fields[field].meta.indexOf('unique') != -1 ||

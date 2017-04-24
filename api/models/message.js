@@ -6,6 +6,8 @@ const uuid = require('uuid/v4');
 var Message = function(args){
   DbBase.call(this);
 
+
+  this.type = "Message";
   this.db_fields = new Message.db_blueprint();
 
   this.validate = function(db_fields){

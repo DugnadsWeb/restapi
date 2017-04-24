@@ -11,6 +11,8 @@ var RequiredArgumentExeption = require('../exceptions/required_argument_exceptio
 var User = function(arg){
   Db_base.call(this);
 
+
+  this.type = "User";
   // User propperties
   this.db_fields = new User.db_blueprint();
 

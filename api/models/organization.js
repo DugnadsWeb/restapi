@@ -6,6 +6,8 @@ var uuid = require('uuid/v4');
 var Organization = function(args){
   Db_base.call(this);
 
+
+  this.type = "Organization";
   // Organization propperties
   this.db_fields = new Organization.db_blueprint();
 

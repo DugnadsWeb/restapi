@@ -6,6 +6,7 @@ const uuid = require('uuid/v4');
 var Activity = function(args){
   Db_base.call(this);
 
+  this.type = "Activity";
   this.db_fields = new Activity.db_blueprint();
 
   _init(this, args);
