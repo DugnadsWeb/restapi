@@ -50,7 +50,7 @@ function formatGetAttendants(dbRet){
 /* Create new activity
 *   request body {
 *     activity: {
-*       type: "activity", "sales_activity",
+*       type: "activity", "salesActivity",
 *       startTime: time in ms,
 *       endTIme: time in ms,
 *       description: description of activity,
@@ -67,14 +67,17 @@ routes.post('/', (req, res) =>{
     return;
   }
   let activity;
+  console.log(req.body.activity.type);
   switch (req.body.activity.type) {
     case "activity":
       activity = new Activity(req.body.activity);
       break;
-    case "sales_activity":
+    case "salesActivity":
       activity = new SalesActivity(req.body.activity);
+      break;
     default:
       res.status(400).send("Wrong activity type");
+      break;
   }
 
   let dugnad = new Dugnad(req.body.dugnad);

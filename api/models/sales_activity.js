@@ -41,7 +41,7 @@ var SalesActivity = function(args){
 Object.assign(SalesActivity, Activity);
 
 SalesActivity.db_blueprint = function(){
-  this.salesArticle = new DbField("");
+  this.productName = new DbField("");
 }
 
 module.exports = SalesActivity;
