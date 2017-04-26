@@ -1,6 +1,7 @@
 const express = require('express');
 const Activity = require('../models/activity');
 const Dugnad = require('../models/dugnad');
+const SalesActivity = require('../models/sales_activity');
 const User = require('../models/user');
 
 const routes = express.Router();
@@ -18,6 +19,7 @@ routes.get('/:uuid', (req, res) => {
     res.status(200).send(activity);
   })
   .catch(err => {
+    console.log("GET activity error!");
     console.log(err);
     res.status(400).send(err);
   })
@@ -34,7 +36,6 @@ routes.get('/attendants/:uuid', (req, res) => {
 
 function formatGetAttendants(dbRet){
   let ret = [];
-  console.log(dbRet);
   for (let i=0;i<dbRet.records.length;i++){
     ret.push(dbRet.records[i]._fields[0].properties);
     delete ret[ret.length-1].password;
@@ -49,6 +50,7 @@ function formatGetAttendants(dbRet){
 /* Create new activity
 *   request body {
 *     activity: {
+*       type: "activity", "sales_activity",
 *       startTime: time in ms,
 *       endTIme: time in ms,
 *       description: description of activity,
@@ -64,7 +66,17 @@ routes.post('/', (req, res) =>{
     res.status(400).send({message: "Malformed request body"});
     return;
   }
-  let activity = new Activity(req.body.activity);
+  let activity;
+  switch (req.body.activity.type) {
+    case "activity":
+      activity = new Activity(req.body.activity);
+      break;
+    case "sales_activity":
+      activity = new SalesActivity(req.body.activity);
+    default:
+      res.status(400).send("Wrong activity type");
+  }
+
   let dugnad = new Dugnad(req.body.dugnad);
   activity.create()
   .then(result => {

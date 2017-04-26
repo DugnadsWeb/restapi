@@ -40,7 +40,6 @@ var db_base = function(){
             res(result);
           })
           .catch((err) => {
-          	console.log(err);
             session.close();
             rej(err);
           });
@@ -99,7 +98,6 @@ var db_base = function(){
       var session = driver.session();
       session.run(query)
         .then((result) => {
-          console.log(result);
           session.close();
           if (result.records.length == 1){
             res(this.constructor.name + " was deleted");
@@ -228,7 +226,7 @@ db_base.get_unique = function(unique_id){
     session = driver.session();
     session.run(query)
     .then((result) => {
-      //console.log(result.records[0]._fields[0].properties);
+      session.close();
       if (result.records.length == 0){
         rej("No results found");
       } else if (result.records[0].length == 1){
@@ -236,10 +234,8 @@ db_base.get_unique = function(unique_id){
       } else {
         rej("Multiple results found; something is seriously wrong");
       }
-        session.close();
     })
     .catch((err) => {
-      console.log(err);
       session.close();
       rej(err);
     })

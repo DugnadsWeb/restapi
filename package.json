@@ -7,6 +7,7 @@
     "mkenv": "node test/environment/env_gen.js make"
   },
   "dependencies": {
+    "@ambassify/neo4j-retried": "^1.0.0",
     "body-parser": "^1.16.0",
     "express": "^4.14.1",
     "jsonwebtoken": "^7.2.1",
