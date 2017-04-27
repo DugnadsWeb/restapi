@@ -8,6 +8,7 @@ var Organization = function(args){
 
 
   this.type = "Organization";
+  this.lable = "Organization";
   // Organization propperties
   this.db_fields = new Organization.db_blueprint();
 

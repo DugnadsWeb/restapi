@@ -15,8 +15,8 @@ var SalesActivity = function(args){
   Activity.call(this, args);
 
 
-
-  this.type = this.type + ':SalesActivity';
+  this.type = 'SalesActivity';
+  this.lable = this.lable + ':SalesActivity';
   this.db_fields = Object.assign({}, this.db_fields, new SalesActivity.db_blueprint());
 
   //

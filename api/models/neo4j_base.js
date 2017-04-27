@@ -162,7 +162,7 @@ var db_base = function(){
   // options: use_all - uses all defined object fields
   this.make_query_object = function (tag, options){
       options = !!options ? options : {}
-      let query = "(" + (!!tag ? tag : '') + ":" + this.type + " { ";
+      let query = "(" + (!!tag ? tag : '') + ":" + this.lable + " { ";
       for (var field in this.db_fields){
         if (this.db_fields[field].data !== undefined && this.db_fields[field].data !== null){
           if (this.db_fields[field].meta.indexOf('unique') != -1 ||
@@ -230,7 +230,7 @@ db_base.get_unique = function(unique_id){
       if (result.records.length == 0){
         rej("No results found");
       } else if (result.records[0].length == 1){
-        res(result.records[0]._fields[0].properties);
+        res(result.records[0]._fields[0].properties, result.records[0]._fields[0].labels);
       } else {
         rej("Multiple results found; something is seriously wrong");
       }

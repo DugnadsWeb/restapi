@@ -13,6 +13,7 @@ var User = function(arg){
 
 
   this.type = "User";
+  this.lable = "User";
   // User propperties
   this.db_fields = new User.db_blueprint();
 

@@ -19,8 +19,6 @@ var routes = express.Router();
 
 
 
-// ##########################33 test end
-
 
 
 // get dugnad by id
@@ -44,6 +42,7 @@ routes.get('/activities/:uuid', (req, res) => {
     res.status(200).send(formatGetActivityReturn(result));
   })
   .catch((err) => {
+    console.log(err);
     res.status(400).send(err);
   });
 });
@@ -51,7 +50,10 @@ routes.get('/activities/:uuid', (req, res) => {
 function formatGetActivityReturn(dbReturn){
   let ret = [];
   for (let i=0;i<dbReturn.records.length;i++){
-    ret.push(dbReturn.records[i]._fields[0].properties);
+    let labels = dbReturn.records[i]._fields[0].labels;
+    let activity = dbReturn.records[i]._fields[0].properties;
+    activity.type = labels[labels.length-1];
+    ret.push(activity);
   }
   return ret;
 }

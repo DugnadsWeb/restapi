@@ -15,7 +15,8 @@ const routes = express.Router();
 
 routes.get('/:uuid', (req, res) => {
   Activity.get_unique(req.params.uuid)
-  .then(activity => {
+  .then((activity, labels) => {
+    activity.type = labels[labels.length-1];
     res.status(200).send(activity);
   })
   .catch(err => {
@@ -50,7 +51,7 @@ function formatGetAttendants(dbRet){
 /* Create new activity
 *   request body {
 *     activity: {
-*       type: "activity", "salesActivity",
+*       type: "Activity"/"SalesActivity",
 *       startTime: time in ms,
 *       endTIme: time in ms,
 *       description: description of activity,
@@ -69,10 +70,10 @@ routes.post('/', (req, res) =>{
   let activity;
   console.log(req.body.activity.type);
   switch (req.body.activity.type) {
-    case "activity":
+    case "Activity":
       activity = new Activity(req.body.activity);
       break;
-    case "salesActivity":
+    case "SalesActivity":
       activity = new SalesActivity(req.body.activity);
       break;
     default:

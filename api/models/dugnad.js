@@ -8,6 +8,7 @@ var Dugnad = function(args){
   Db_base.call(this);
 
   this.type = "Dugnad";
+  this.lable = "Dugnad"
   this.db_fields = new Dugnad.db_blueprint();
 
   _init(this, args);
