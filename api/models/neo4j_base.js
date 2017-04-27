@@ -230,7 +230,9 @@ db_base.get_unique = function(unique_id){
       if (result.records.length == 0){
         rej("No results found");
       } else if (result.records[0].length == 1){
-        res(result.records[0]._fields[0].properties, result.records[0]._fields[0].labels);
+        let ret = result.records[0]._fields[0].properties;
+        ret.labels = result.records[0]._fields[0].labels;
+        res(ret);
       } else {
         rej("Multiple results found; something is seriously wrong");
       }

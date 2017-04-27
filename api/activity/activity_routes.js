@@ -15,8 +15,9 @@ const routes = express.Router();
 
 routes.get('/:uuid', (req, res) => {
   Activity.get_unique(req.params.uuid)
-  .then((activity, labels) => {
-    activity.type = labels[labels.length-1];
+  .then((activity) => {
+    console.log(activity);
+    activity.type = activity.labels[activity.labels.length-1];
     res.status(200).send(activity);
   })
   .catch(err => {
