@@ -6,9 +6,9 @@ const SalesActivity = require('../models/activity');
 const routes = express.Router();
 
 
-routes.get('./get-sales-stats/:uuid', (req, res) => {
+routes.get('/stats/:uuid', (req, res) => {
   let activity = new SalesActivity(req.params);
-  let query = "MATCH " + activity.make_query_object() +  "<-[a:Seller]-" +
+  let query = "MATCH " + activity.make_query_object() +  "<-[a:Attends]-" +
     "(b:User) RETURN a, b";
   SalesActivity.custom_query(query)
   .then(dbRet => {
@@ -22,9 +22,14 @@ routes.get('./get-sales-stats/:uuid', (req, res) => {
 function formatgetSalesStateRet(dbRet){
   let ret = [];
   for (let i=0;i<dbRet.records.length;i++){
-    let sales = dbRet.records[i]._fields[0].properties;
-    let users = dbRet.dbRet.records[i]._fields[1].properties;
-    ret.push({sales: sales, users:users});
+    let sold = 0;
+    let product = 0;
+    if (!!dbRet.records[i]._fields[0].properties.sold)
+      sold = dbRet.records[i]._fields[0].properties.sold.low;
+    if (!!dbRet.records[i]._fields[0].properties.product)
+      product = dbRet.records[i]._fields[0].properties.product.low;
+    let user = dbRet.records[i]._fields[1].properties;
+    ret.push({product: product, sold: sold, user:user});
   }
   return ret;
 }
@@ -37,16 +42,16 @@ function formatgetSalesStateRet(dbRet){
  * }
 */
 routes.post('/set-member-supply', (req, res) => {
-  if (!req.user || !req.activity || !req.ammount){
+  if (!req.body.user || !req.body.activity || !req.body.ammount){
     res.status(400).send({message: "Malformed request body"});
     return;
   }
-  let user = new User(req.user);
-  let activity = new SalesActivity(req.activity);
+  let user = new User(req.body.user);
+  let activity = new SalesActivity(req.body.activity);
   let query = "MATCH " + activity.make_query_object() + "<-[a:Attends]-" +
-    user.make_query_object() + " SET a :Seller " + " a.product = " + req.ammount +
-    "RETURN a";
-  Activity.custom_query(query)
+    user.make_query_object() + " SET a.product = " + req.body.ammount +
+    " RETURN a";
+  SalesActivity.custom_query(query)
     .then(dbRet => {
       if(dbRet.records.length == 1){
         res.status(200).send({message: "Product set"});
@@ -66,16 +71,17 @@ routes.post('/set-member-supply', (req, res) => {
  *  "ammount": int
  * }
 */
-routes.post('/set-items.sold', (req, res) => {
-  if (!req.activity || !req.ammount){
+routes.post('/set-items-sold', (req, res) => {
+  if (!req.body.activity || !req.body.ammount){
     res.status(400).send({message: "Malformed request body"});
     return;
   }
-  let activity = new Activity(req.activity);
+  let activity = new SalesActivity(req.body.activity);
+  let user = new User(req.auth_token);
   let query = "MATCH " + activity.make_query_object() + "<-[a:Attends]-" +
-    user.make_query_object() + " SET a :Seller " + " a.sold = " + req.ammount +
-    "RETURN a";
-  Activity.custom_query(query)
+    user.make_query_object() + " SET a.sold = " + req.body.ammount +
+    " RETURN a";
+  SalesActivity.custom_query(query)
     .then(dbRet => {
       if(dbRet.records.length == 1){
         res.status(200).send({message: "Sales set"});
@@ -87,6 +93,7 @@ routes.post('/set-items.sold', (req, res) => {
     res.status(400).send(err);
   })
 })
+
 
 
 module.exports = routes;
