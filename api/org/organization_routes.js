@@ -37,6 +37,7 @@ routes.get('/:uuid', (req, res) => {
     if (err == "No results found"){
       res.status(404).send(err);
     } else {
+      console.log(err);
       res.status(400).send(err);
     }
   });
