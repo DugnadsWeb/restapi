@@ -44,7 +44,8 @@ Activity.db_blueprint = function(){
   this.startTime = new DbField("0"),
   this.endTime = new DbField("0"),
   this.description = new DbField(""),
-  this.maxPartisipants = new DbField(0)
+  this.maxPartisipants = new DbField(0),
+  this.isActive = new DbField(false)
 }
 
 module.exports = Activity;

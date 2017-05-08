@@ -79,8 +79,9 @@ routes.post('/', (req, res) =>{
       activity = new SalesActivity(req.body.activity);
       break;
     default:
+      console.log(req.body.activity);
       res.status(400).send("Wrong activity type");
-      break;
+      return;
   }
 
   let dugnad = new Dugnad(req.body.dugnad);
@@ -179,6 +180,7 @@ routes.post('/apply', (req, res) => {
 *   }
 */
 routes.put('/', (req, res) => {
+  console.log(req.body);
   if (!req.body.activity) {
     res.status(400).send({message:"request body is incomplete"});
     return;
