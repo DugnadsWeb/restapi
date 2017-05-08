@@ -197,6 +197,26 @@ routes.put('/', (req, res) => {
   })
 });
 
+// #######
+// DELETE#
+// #######
+
+routes.delete('/:uuid', (req,res) => {
+
+    let act = new Activity(req.params);
+
+    query = "MATCH " + act.make_query_object('a') +
+        " DETACH DELETE a";
+
+    Activity.custom_query(query)
+        .then((result) => {
+            res.status(200).send({message: "Org deleted"});
+        })
+        .catch((err) => {
+            console.log("Fuck error " + error);
+            res.status(400).send(err);
+        })
+});
 
 routes.use('/sales', sales);
 

@@ -215,6 +215,28 @@ routes.put('/', (req, res) => {
   })
 });
 
+// #######
+// DELETE#
+// #######
+
+routes.delete('/:uuid', (req,res) => {
+
+    console.log("I have entered delete with param " + req.params)
+    let dugnad = new Dugnad(req.params);
+
+    query = "MATCH " + dugnad.make_query_object('a') +
+        " DETACH DELETE a";
+
+    Dugnad.custom_query(query)
+      .then((result) => {
+        res.status(200).send({message: "Dugnad deleted"});
+      })
+      .catch((err) => {
+        console.log("Fuck error " + error);
+        res.status(400).send(err);
+      })
+});
+
 
 
 module.exports = routes;
