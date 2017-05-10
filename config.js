@@ -7,4 +7,7 @@ module.exports = {
 
   'secret': 'yoloswag',
   'port': 8888,
+
+  'logDir': './log/',
+
 }
