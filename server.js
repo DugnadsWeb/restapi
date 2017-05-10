@@ -15,7 +15,7 @@ var apiRoutes = require('./api/api_routes');
 // configuration =========
 // =======================
 var port = config.port; // used to create, sign, and verify tokens
-
+global.conf = config;
 // init database driver
 dbDriver = neo4j();
 
