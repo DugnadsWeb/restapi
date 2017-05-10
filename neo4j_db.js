@@ -4,9 +4,9 @@ var conf = require('./config').database;
 // creates and returns a database driver
 var db
 module.exports = function() {
-    if (db == null) {
-        auth = neo4j.auth.basic(conf.user, conf.pw);
-        db = neo4j.driver(conf.server, auth);
-    }
+
+    auth = neo4j.auth.basic(conf.user, conf.pw);
+    db = neo4j.driver(conf.server, auth);
+
     return db;
 }

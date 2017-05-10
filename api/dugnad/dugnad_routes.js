@@ -81,6 +81,34 @@ function formatDugnadReturn(dbDugnad){
   }
   return ret;
 }
+
+routes.get('/print/:uuid', (req,res) => {
+  let dugnad = new Dugnad(req.params);
+  query = "MATCH " + dugnad.make_query_object('a') +
+          "-[r:Has]->(b:Activity)<-[re:Attends]-(c:User) " +
+          "RETURN b,Collect(c)";
+  Dugnad.custom_query(query)
+      .then(ret => {
+        res.status(200).send(formatPrintReturn(ret));
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      })
+})
+
+function formatPrintReturn(dbPrint){
+  let ret = [];
+  for(let i = 0; i<dbPrint.records.length; i++){
+    activity = (dbPrint.records[i]._fields[0].properties);
+    activity.attends = [];
+      for(let j = 0; j < dbPrint.records[i]._fields[1].length; j++){
+        delete dbPrint.records[i]._fields[1][j].properties.password;
+            activity.attends.push(dbPrint.records[i]._fields[1][j].properties);
+      }
+      ret.push(activity);
+  }
+  return ret;
+}
 // #######
 // POST ##
 // #######
@@ -185,6 +213,28 @@ routes.put('/', (req, res) => {
   .catch((err) => {
     res.status(400).send(err);
   })
+});
+
+// #######
+// DELETE#
+// #######
+
+routes.delete('/:uuid', (req,res) => {
+
+    console.log("I have entered delete with param " + req.params)
+    let dugnad = new Dugnad(req.params);
+
+    query = "MATCH " + dugnad.make_query_object('a') +
+        " DETACH DELETE a";
+
+    Dugnad.custom_query(query)
+      .then((result) => {
+        res.status(200).send({message: "Dugnad deleted"});
+      })
+      .catch((err) => {
+        console.log("Fuck error " + error);
+        res.status(400).send(err);
+      })
 });
 
 

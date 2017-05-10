@@ -179,7 +179,7 @@ var db_base = function(){
   function build_update_query(me){
     query = " SET ";
     for (field in me.db_fields){
-      if (!!me.db_fields[field].data){
+      if (!!me.db_fields[field].data || typeof me.db_fields[field].data == 'boolean'){
         query += "a." + field + " = \"" + me.db_fields[field].data + "\",";
       }
     }
