@@ -1,6 +1,5 @@
 var Db_base = require('./neo4j_base.js');
 var DbField = require('./db_field.js');
-var RequiredArgumentExeption = require('../exceptions/required_argument_exception.js');
 var uuid = require('uuid/v4');
 
 var Organization = function(args){

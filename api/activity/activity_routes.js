@@ -3,7 +3,7 @@ const Activity = require('../models/activity');
 const Dugnad = require('../models/dugnad');
 const SalesActivity = require('../models/sales_activity');
 const User = require('../models/user');
-const sales = require('./sales');
+const sales_routes = require('./sales_routes');
 
 const routes = express.Router();
 
@@ -196,7 +196,7 @@ routes.put('/', (req, res) => {
 });
 
 
-routes.use('/sales', sales);
+routes.use('/sales', sales_routes);
 
 
 

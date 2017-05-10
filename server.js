@@ -46,7 +46,7 @@ app.use('/api', apiRoutes);
 // start the server ======
 // =======================
 app.listen(port, function(){
-    console.log('Magic happens at http://localhost:' + port);
+    console.log('Server is up and running at http://localhost:' + port);
 });
 
 
