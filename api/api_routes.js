@@ -29,6 +29,10 @@ routes.options("/*", function(req, res){
   res.sendStatus(200);
 });
 
+// inputsanitizer
+var sanitizer = require('./middleware/quote_escaper_middleware');
+routes.use(sanitizer);
+
 // open apis
 routes.use('/auth', auth);
 

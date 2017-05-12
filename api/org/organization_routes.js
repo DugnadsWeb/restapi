@@ -155,7 +155,8 @@ routes.get('/stats/attendants/year/:uuid/:year', (req, res) => {
   let query = "MATCH " + org.make_query_object('a') +
     "-[:Owns]-(b:Dugnad)-[:Has]-(c:Activity)-[:Attends]-(d:User)" +
     "WHERE toInt(b.startTime) > " + minMs + " AND toInt(b.startTime) < " + maxMs +
-    " RETURN d, count(d)";
+    " With distinct(d) as dugnadWorker, b" +
+    " RETURN dugnadWorker, count(dugnadWorker)";
   Organization.custom_query(query)
   .then( dbRet => {
     res.status(200).send(formatStatsAttendantsReturn(dbRet));
