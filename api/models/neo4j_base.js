@@ -10,8 +10,10 @@ var driver = require('../../neo4j_db')();
 
 var db_base = function(){
 
+
+  // these propperties are overwritten by subclass
   this.db_fields = {};
-  this.validate = {};
+  this.validate = () => {return ture};
 
   // ###########
   // methods ###

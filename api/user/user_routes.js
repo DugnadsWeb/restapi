@@ -79,17 +79,19 @@ routes.get('/organizations/:email', (req, res) =>{
 function formatOrganizations(dbOrg){
     let ret = [];
     for(let i=0;i<dbOrg.records.length;i++){
-        ret.push(dbOrg.records[i]._fields[0].properties.orgName);
-        ret.push(dbOrg.records[i]._fields[0].properties.uuid);
+      let obj = {}
+      obj.orgName = dbOrg.records[i]._fields[0].properties.orgName;
+      obj.uuid = dbOrg.records[i]._fields[0].properties.uuid;
+      ret.push(obj);
     }
     return ret;
 }
 
 function formatProfilePic(dbUser){
   let ret = [];
-	
-	ret.push(dbUser.records[0]._fields[0].properties.base64);	
-	
+
+	ret.push(dbUser.records[0]._fields[0].properties.base64);
+
 	return ret;
 }
 
